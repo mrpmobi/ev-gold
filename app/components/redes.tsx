@@ -62,10 +62,10 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
       setIsLoading(true);
       const token = authManager.getToken();
       if (!token) return;
-      
+
       const queryParams = new URLSearchParams();
       const offset = (currentPage - 1) * itemsPerPage;
-      
+
       queryParams.append("limit", itemsPerPage.toString());
       queryParams.append("offset", offset.toString());
 
@@ -94,7 +94,7 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
 
       const data = await res.json();
       console.log("API response:", data);
-      
+
       if (res.ok) {
         setDownlines(data.downlines || []);
         setTotalCount(data.totalCount || data.downlines?.length || 0);
@@ -118,7 +118,14 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
 
   const statsData = [
     { label: "Total de patrocínios", value: downlinesAllCount },
-    { label: "Total de diretos", value: diretos || 0 },
+    {
+      label: "Total de ganhos",
+      value: formatMoney(
+        downlines
+          .reduce((total, downline) => total + (downline.total_valor || 0), 0)
+          .toString()
+      ),
+    },
   ];
 
   const tableData = useMemo(() => {
@@ -128,7 +135,7 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
       level: downline.nivel,
       levelBg:
         downline.nivel === 1
-          ? "bg-primarymobi"
+          ? "bg-primary"
           : downline.nivel === 2
           ? "bg-greyscale-70"
           : "bg-greyscale-40",
@@ -344,7 +351,10 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                           ))
                         ) : (
                           <TableRow>
-                            <TableCell colSpan={5} className="text-center text-white py-4">
+                            <TableCell
+                              colSpan={5}
+                              className="text-center text-white py-4"
+                            >
                               Nenhum downline encontrado
                             </TableCell>
                           </TableRow>
@@ -358,8 +368,15 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                       <PaginationContent className="flex items-center gap-1">
                         <PaginationItem>
                           <PaginationLink
-                            className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg text-white hover:bg-greyscale-70 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                            className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg text-white hover:bg-greyscale-70 ${
+                              currentPage === 1
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                            onClick={() =>
+                              currentPage > 1 &&
+                              handlePageChange(currentPage - 1)
+                            }
                           >
                             <div className="relative w-fit mt-[-3.50px] mb-[-1.50px] font-h2 font-[number:var(--h2-font-weight)] text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)]">
                               Anterior
@@ -377,7 +394,7 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                               <PaginationLink
                                 className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg ${
                                   item.active
-                                    ? "bg-primarymobi text-primaryblack"
+                                    ? "bg-primary text-primaryblack"
                                     : "text-white hover:bg-greyscale-70"
                                 }`}
                                 onClick={() =>
@@ -394,8 +411,15 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
 
                         <PaginationItem>
                           <PaginationLink
-                            className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg text-white hover:bg-greyscale-70 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                            className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg text-white hover:bg-greyscale-70 ${
+                              currentPage === totalPages
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                            onClick={() =>
+                              currentPage < totalPages &&
+                              handlePageChange(currentPage + 1)
+                            }
                           >
                             <div className="relative w-fit mt-[-3.50px] mb-[-1.50px] font-h2 font-[number:var(--h2-font-weight)] text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)]">
                               Próxima

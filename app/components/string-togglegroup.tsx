@@ -36,8 +36,8 @@ export function StringToggleGroup({
             value={option.value}
             className={`inline-flex justify-center px-2 py-1 flex-[0_0_auto] rounded-[49px] items-center gap-2.5 relative overflow-hidden h-auto hover:bg-[#424242] ${
               filter === option.value
-                ? "bg-primarymobi shadow-[0px_9px_40px_#ff9649] data-[state=on]:bg-primarymobi"
-                : "data-[state=on]:bg-primarymobi"
+                ? "bg-primary shadow-[0px_9px_40px_#ff9649] data-[state=on]:bg-primary"
+                : "data-[state=on]:bg-primary"
             }`}
           >
             <div
