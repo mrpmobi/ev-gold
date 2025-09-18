@@ -151,7 +151,7 @@ export function HeaderPanel({
         <div className="flex flex-row items-center gap-1">
           <Button
             size="icon"
-            className="bg-primaryblack hover:bg-primarymobi text-greyscale-70 hover:text-primaryblack"
+            className="bg-primaryblack hover:bg-primary text-greyscale-70 hover:text-primaryblack"
             onClick={toggleChat}
           >
             <Headset className="w-6 h-6" />

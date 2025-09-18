@@ -47,7 +47,7 @@ export function UltimosGanhos() {
       <DropdownMenuTrigger asChild>
         <Button
           size="icon"
-          className="bg-primaryblack hover:bg-primarymobi text-greyscale-70 hover:text-primaryblack"
+          className="bg-primaryblack hover:bg-primary text-greyscale-70 hover:text-primaryblack"
         >
           <Bell className="w-6 h-6" />
         </Button>

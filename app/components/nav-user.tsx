@@ -21,7 +21,7 @@ export function NavUser({ name, handleLogout, setCurrentPage }: NavUserProps) {
         <Button
           variant="outline"
           className="
-          border-[#121212] bg-[#121212] hover:bg-[#FF842A] 
+          border-[#121212] bg-[#121212] hover:bg-primary 
           focus:outline-none focus:ring-0 focus:ring-offset-0
           active:ring-0 active:ring-offset-0
           focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#121212]
@@ -41,7 +41,7 @@ export function NavUser({ name, handleLogout, setCurrentPage }: NavUserProps) {
         <DropdownMenuGroup>
 
           <DropdownMenuItem
-            className="text-[#C0C0C0] focus:bg-gradient-to-r focus:from-[#FF842A] focus:to-[#FF964A]
+            className="text-[#C0C0C0] focus:bg-primary
             focus:text-[#121212]"
             onClick={() => setCurrentPage("perfil")}
           >
@@ -49,7 +49,7 @@ export function NavUser({ name, handleLogout, setCurrentPage }: NavUserProps) {
             Meu Perfil
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-[#C0C0C0] focus:bg-gradient-to-r focus:from-[#FF842A] focus:to-[#FF964A]
+            className="text-[#C0C0C0] focus:bg-primary
               focus:text-[#121212]"
             onClick={handleLogout}
           >

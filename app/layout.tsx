@@ -4,9 +4,11 @@ import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Mobi',
-  description: 'Created by MRP Mobi',
-  generator: 'Mobi',
+  title: 'MRP Gold',
+  description: 'MRP Gold',
+  icons: {
+    icon: '/crown.svg'
+  }
 }
 
 const epilogue = Epilogue({ 

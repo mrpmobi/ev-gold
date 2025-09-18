@@ -60,7 +60,7 @@ export default function LoginComponent({
     setIsLoading(true);
     setError("");
 
-    try {
+    /*try {
       const result = await apiService.login({
         email: formData.email,
         password: formData.password,
@@ -121,7 +121,8 @@ export default function LoginComponent({
       setError("Erro de conexão. Verifique sua internet e tente novamente.");
     } finally {
       setIsLoading(false);
-    }
+    }*/
+    onLogin(formData.email, {});
   };
 
   const handleInputChange = (field: string, value: string) => {

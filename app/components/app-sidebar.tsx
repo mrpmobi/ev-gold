@@ -29,13 +29,20 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
 
   const { setOpenMobile } = useSidebar();
   return (
-    <Sidebar variant="floating" collapsible="offcanvas" className="pl-6 py-6 pr-0">
+    <Sidebar
+      variant="floating"
+      collapsible="offcanvas"
+      className="pl-6 py-6 pr-0"
+    >
       <SidebarHeader>
         <div className="px-6 py-8 justify-between w-full  flex items-center">
           <img src="/crown.svg" alt="Logo" className="w-[99px] h-[35px]" />
-          <Button 
-          onClick={() => setOpenMobile(false)}
-          variant="ghost" size="icon" className="h-auto p-0 bg-transparent hover:bg-transparent md:hidden">
+          <Button
+            onClick={() => setOpenMobile(false)}
+            variant="ghost"
+            size="icon"
+            className="h-auto p-0 bg-transparent hover:bg-transparent md:hidden"
+          >
             <X className="w-8 h-8" />
           </Button>
         </div>
@@ -48,6 +55,7 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
                 <SidebarMenuButton
                   asChild
                   onClick={handleClick.bind(null, "home")}
+                  className="hover:bg-primary"
                 >
                   <div>
                     <Home />
@@ -59,6 +67,7 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
                 <SidebarMenuButton
                   asChild
                   onClick={handleClick.bind(null, "redes")}
+                  className="hover:bg-primary"
                 >
                   <div>
                     <Network />
@@ -70,6 +79,7 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
                 <SidebarMenuButton
                   asChild
                   onClick={handleClick.bind(null, "extrato")}
+                  className="hover:bg-primary"
                 >
                   <div>
                     <List />
@@ -86,12 +96,22 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem key="politica-privacide">
-                <Link href="/politica-de-privacidade" target="_blank" rel="noopener noreferrer" aria-label="Política de Privacidade">
+                <Link
+                  href="/politica-de-privacidade"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Política de Privacidade"
+                >
                   Política de privacidade
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem key="termos-condicoes">
-                <Link href="/termos-de-uso" target="_blank" rel="noopener noreferrer" aria-label="Termos de Uso">
+                <Link
+                  href="/termos-de-uso"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Termos de Uso"
+                >
                   Termos e condições
                 </Link>
               </SidebarMenuItem>

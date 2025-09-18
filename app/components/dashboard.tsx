@@ -169,9 +169,9 @@ export default function DashboardComponent({
             setCurrentPage={setCurrentPage}
           />
           <div
-            className="pt-[102px] flex flex-col items-start gap-4 md:gap-6 px-0 relative self-stretch w-full 
-          flex-[0_0_auto] border-b [border-bottom-style:solid] border-transparent 
-          [border-image:linear-gradient(90deg,rgba(249,142,48,0)_0%,rgba(249,142,48,1)_20%,rgba(147,84,28,1)_88%,rgba(147,84,28,0)_100%)_1]"
+            className="pt-[80px] pb-[10px] flex flex-col items-start gap-4 md:gap-6 px-0 relative self-stretch w-full 
+  flex-[0_0_auto] border-b [border-bottom-style:solid] border-transparent 
+  [border-image:linear-gradient(90deg,rgba(255,233,100,0)_0%,hsl(50,98%,64%)_20%,hsl(45,98%,54%)_88%,rgba(255,215,70,0)_100%)_1]"
           ></div>
           {currentPage === "home" && (
             <>
