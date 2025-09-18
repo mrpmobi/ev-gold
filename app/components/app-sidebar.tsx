@@ -32,7 +32,7 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
     <Sidebar variant="floating" collapsible="offcanvas" className="pl-6 py-6 pr-0">
       <SidebarHeader>
         <div className="px-6 py-8 justify-between w-full  flex items-center">
-          <img src="/mobi.svg" alt="Logo" className="w-[99px] h-[35px]" />
+          <img src="/crown.svg" alt="Logo" className="w-[99px] h-[35px]" />
           <Button 
           onClick={() => setOpenMobile(false)}
           variant="ghost" size="icon" className="h-auto p-0 bg-transparent hover:bg-transparent md:hidden">
@@ -47,7 +47,6 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
               <SidebarMenuItem key="home">
                 <SidebarMenuButton
                   asChild
-                  className="hover:bg-gradient-to-r hover:from-[#FF842A] hover:to-[#FF964A] h-[40px]"
                   onClick={handleClick.bind(null, "home")}
                 >
                   <div>
@@ -59,7 +58,6 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
               <SidebarMenuItem key="redes">
                 <SidebarMenuButton
                   asChild
-                  className="hover:bg-gradient-to-r hover:from-[#FF842A] hover:to-[#FF964A] h-[40px]"
                   onClick={handleClick.bind(null, "redes")}
                 >
                   <div>
@@ -71,7 +69,6 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
               <SidebarMenuItem key="extrato">
                 <SidebarMenuButton
                   asChild
-                  className="hover:bg-gradient-to-r hover:from-[#FF842A] hover:to-[#FF964A] h-[40px]"
                   onClick={handleClick.bind(null, "extrato")}
                 >
                   <div>

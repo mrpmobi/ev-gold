@@ -175,12 +175,9 @@ export default function DashboardComponent({
           ></div>
           {currentPage === "home" && (
             <>
-              <Banner />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 pt-[24px]">
                 <div className="grid grid-cols-1 gap-4 md:gap-6">
                   <SaldoCard saldo={saldo} />
-                  <LinkCard linkConvite={linkConvite} />
-                  <BaixarAppCard />
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:gap-6">
                   <PatrociniosCard
@@ -188,7 +185,6 @@ export default function DashboardComponent({
                     downlinesAllCount={downlinesAllCount}
                     setCurrentPage={setCurrentPage}
                   />
-                  <DiretosCard diretos={diretos} />
                 </div>
               </div>
             </>
