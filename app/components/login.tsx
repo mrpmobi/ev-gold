@@ -18,7 +18,10 @@ interface LoginComponentProps {
   onGoToCadastro: () => void;
 }
 
-export default function LoginComponent({ onLogin, onGoToCadastro }: LoginComponentProps) {
+export default function LoginComponent({
+  onLogin,
+  onGoToCadastro,
+}: LoginComponentProps) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -36,15 +39,14 @@ export default function LoginComponent({ onLogin, onGoToCadastro }: LoginCompone
       if (userResult.success && userResult.data) {
         let userData = userResult.data;
 
-      let downlines: User[] = [];
-      //if (fetchDownlines) {
-      //  const downlinesResult = await apiService.getUserDownlines(userId, token);
-      //  downlines = downlinesResult.success ? downlinesResult.data : [];
-      //}
+        let downlines: User[] = [];
+        //if (fetchDownlines) {
+        //  const downlinesResult = await apiService.getUserDownlines(userId, token);
+        //  downlines = downlinesResult.success ? downlinesResult.data : [];
+        //}
 
-      return { userData, downlines };
+        return { userData, downlines };
       }
-      
     } catch (error) {
       //console.error("Erro ao carregar dados do usuário:", error);
       throw error;
@@ -65,15 +67,27 @@ export default function LoginComponent({ onLogin, onGoToCadastro }: LoginCompone
       });
 
       if (result.success && result.data && result.access_token) {
-        const userDetailsResult = await apiService.findUserByEmail(formData.email, result.access_token);
+        const userDetailsResult = await apiService.findUserByEmail(
+          formData.email,
+          result.access_token
+        );
 
         if (userDetailsResult.success && userDetailsResult.data) {
-          const actualUser = (userDetailsResult.data as any).usuario || userDetailsResult.data;
+          const actualUser =
+            (userDetailsResult.data as any).usuario || userDetailsResult.data;
 
           if (actualUser && actualUser.id) {
-            const userFullData = await loadUserData(actualUser.id, result.access_token);
+            const userFullData = await loadUserData(
+              actualUser.id,
+              result.access_token
+            );
 
-            authManager.saveAuth(actualUser, result.access_token, result.data.expires_in, result.data.token_type);
+            authManager.saveAuth(
+              actualUser,
+              result.access_token,
+              result.data.expires_in,
+              result.data.token_type
+            );
 
             // Tracking do Meta Pixel
             if (typeof window !== "undefined" && (window as any).fbq) {
@@ -85,15 +99,22 @@ export default function LoginComponent({ onLogin, onGoToCadastro }: LoginCompone
               ...userFullData,
             });
           } else {
-            setError("Erro ao obter dados completos do usuário. Tente novamente.");
+            setError(
+              "Erro ao obter dados completos do usuário. Tente novamente."
+            );
             authManager.clearAuth();
           }
         } else {
-          setError(userDetailsResult.message || "Erro ao obter dados do usuário. Tente novamente.");
+          setError(
+            userDetailsResult.message ||
+              "Erro ao obter dados do usuário. Tente novamente."
+          );
           authManager.clearAuth();
         }
       } else {
-        setError(result.message || "Email ou senha inválidos. Tente novamente.");
+        setError(
+          result.message || "Email ou senha inválidos. Tente novamente."
+        );
       }
     } catch (error) {
       //console.error("Erro no login:", error);
@@ -112,35 +133,30 @@ export default function LoginComponent({ onLogin, onGoToCadastro }: LoginCompone
   };
 
   return (
-    <div className="flex flex-col min-h-screen min-w-screen items-center justify-center gap-4 p-0 relative border-none bg-[linear-gradient(180deg,rgba(29,29,29,1)_0%,rgba(15,15,15,1)_100%)]">
-      <Image width={124} height={44} className="absolute top-14 md:left-14 aspect-[2.82]" alt="Mrp mobi completo" src="mobi.svg" />
-      <Image width={1366} height={800} className="hidden md:block left-0 absolute top-0 h-full object-cover" alt="Group" src="login-foreground-2.svg" />
-      <Image width={1174} height={800} className="hidden md:block left-48 absolute bottom-0 h-full object-cover" alt="Group" src="login-foreground-1.svg" />
+    <div className="flex flex-col min-h-screen min-w-screen items-center justify-center gap-4 p-0 relative border-none bg-[#202020]">
       <Image
-        width={375}
-        height={300}
-        className="block md:hidden left-0 absolute w-full bottom-0 object-cover"
-        alt="Mobile background"
-        src="/login-foreground-mobile-1.svg"
-      />
-      <Image
-        width={375}
-        height={300}
-        className="block md:hidden left-0 absolute top-0 h-full w-full object-cover"
-        alt="Mobile foreground"
-        src="/login-foreground-mobile-2.svg"
+        width={124}
+        height={44}
+        className="absolute top-14 md:left-14 aspect-[2.82]"
+        alt="Mrp mobi completo"
+        src="crown.svg"
       />
       <div className="w-full px-4 md:px-0 inline-flex flex-col items-center justify-center relative flex-[0_0_auto]">
         {cardView === "login" && (
           <Card className="w-full md:w-[400px] h-min-[322px] bg-[#ffffff0d] rounded-2xl border border-solid border-greyscale-70 backdrop-blur-[5.85px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(5.85px)_brightness(100%)]">
             <CardHeader className="pb-0">
-              <CardTitle className="text-center text-white text-base">Acesse sua conta de patrocinador</CardTitle>
+              <CardTitle className="text-center text-white text-base">
+                Acesse sua conta de patrocinador
+              </CardTitle>
             </CardHeader>
             <CardContent className="px-6 md:px-8 py-6 pt-0 flex items-center justify-center">
               {isLoadingUserData ? (
                 <Loader2 className="h-8 w-8 animate-spin text-white" />
               ) : (
-                <form onSubmit={handleSubmit} className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]"
+                >
                   {error && (
                     <Alert variant="destructive">
                       <AlertDescription>{error}</AlertDescription>
@@ -152,7 +168,9 @@ export default function LoginComponent({ onLogin, onGoToCadastro }: LoginCompone
                       type="email"
                       placeholder="seu@email.com"
                       value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("email", e.target.value)
+                      }
                       required
                       className="
                           [font-family:'Montserrat-Regular',Helvetica] font-normal text-primaryblack 
@@ -170,7 +188,9 @@ export default function LoginComponent({ onLogin, onGoToCadastro }: LoginCompone
                       type={showPassword ? "text" : "password"}
                       placeholder="Digite sua senha"
                       value={formData.password}
-                      onChange={(e) => handleInputChange("password", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("password", e.target.value)
+                      }
                       required
                       className="[font-family:'Montserrat-Regular',Helvetica] font-normal text-primaryblack 
                           text-xs tracking-[0] leading-[18px] overflow-hidden text-ellipsis
@@ -184,14 +204,18 @@ export default function LoginComponent({ onLogin, onGoToCadastro }: LoginCompone
                       className="absolute right-4 top-3 text-greyscale-60 hover:text-greyscale-50"
                       disabled={isLoading}
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
 
                   <div className="flex flex-col items-center gap-4 relative self-stretch w-full flex-[0_0_auto]">
                     <Button
                       type="submit"
-                      className="h-11 whitespace-nowrap flex items-center gap-2 bg-primarymobi text-primaryblack hover:bg-secondaryorange-m rounded-xs self-stretch"
+                      className="h-11 whitespace-nowrap flex items-center gap-2 text-primaryblack rounded-xs self-stretch"
                       disabled={isLoading}
                     >
                       {isLoading ? "Entrando..." : "Entrar"}
@@ -210,7 +234,9 @@ export default function LoginComponent({ onLogin, onGoToCadastro }: LoginCompone
             </CardContent>
           </Card>
         )}
-        {cardView === "recuperar" && <RecuperarSenha setCardView={setCardView} />}
+        {cardView === "recuperar" && (
+          <RecuperarSenha setCardView={setCardView} />
+        )}
       </div>
     </div>
   );
