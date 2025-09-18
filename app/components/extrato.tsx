@@ -1,0 +1,402 @@
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+} from "@/components/ui/pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { formatDate, formatDateMobile, formatMoney } from "@/utils/formatters";
+import React, { useEffect, useMemo, useState } from "react";
+import { DatePicker } from "./date-picker";
+import { StringToggleGroup } from "./string-togglegroup";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import { ExtratoSheet } from "./extrato-sheet";
+import { SaqueDialog } from "./saque-dialog";
+import { authManager } from "@/lib/auth";
+import { API_BASE_URL } from "@/lib/api";
+
+const typeOptions = [
+  { value: "todos", label: "Todos" },
+  { value: "entrada", label: "Entrada" },
+  { value: "saida", label: "Saída" },
+];
+
+function toISODateString(date: Date | undefined): string | undefined {
+  if (!date) return undefined;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+interface Transaction {
+  date: string;
+  description: string;
+  value: string;
+  type: "entrada" | "saida";
+}
+
+interface ExtratoProps {
+  saldo: string;
+}
+
+export function Extrato({ saldo }: ExtratoProps) {
+  const [typeFilter, setTypeFilter] = useState("todos");
+  const [dataInicial, setDataInicial] = useState<Date | undefined>(undefined);
+  const [dataFinal, setDataFinal] = useState<Date | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const itemsPerPage = 9;
+  const [cpf, setCpf] = useState("");
+  const [totalEntradas, setTotalEntradas] = useState("0,00");
+  const [totalSaidas, setTotalSaidas] = useState("0,00");
+  const [initialTableData, setInitialTableData] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCPF = async () => {
+      try {
+        const token = authManager.getToken();
+        const response = await fetch(`${API_BASE_URL}/office/user/profile`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+        if (!response.ok)
+          throw new Error(data.message || "Erro ao carregar perfil");
+
+        // Extrai o CPF diretamente
+        const cpf = data.personal?.tax_id || data.personal?.document || "";
+        setCpf(cpf);
+      } catch (err) {
+        //console.error("Erro ao carregar CPF:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCPF();
+  }, []);
+
+  function calculaEntradasESaidas() {
+    let entradas = 0;
+    let saidas = 0;
+
+    initialTableData.forEach((item) => {
+      const valorNumerico = parseFloat(
+        item.value.replace("R$ ", "").replace(",", ".").replace("-", "")
+      );
+      if (item.type === "entrada") {
+        entradas += valorNumerico;
+      } else if (item.type === "saida") {
+        saidas += valorNumerico;
+      }
+    });
+
+    setTotalEntradas(formatMoney(entradas));
+    setTotalSaidas(formatMoney(saidas));
+    const saldoAtual = entradas - saidas;
+  }
+
+  useEffect(() => {
+    calculaEntradasESaidas();
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [typeFilter, dataInicial, dataFinal]);
+
+  const filteredTableData = useMemo(() => {
+    const startDate = toISODateString(dataInicial);
+    const endDate = toISODateString(dataFinal);
+
+    return initialTableData.filter((item) => {
+      if (typeFilter !== "todos" && item.type !== typeFilter) {
+        return false;
+      }
+
+      if (startDate && item.date < startDate) {
+        return false;
+      }
+
+      if (endDate && item.date > endDate) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [typeFilter, dataInicial, dataFinal]);
+
+  const totalPages = Math.ceil(filteredTableData.length / itemsPerPage);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const currentTableData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredTableData.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredTableData, currentPage]);
+
+  const getPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        items.push({ number: i.toString(), active: i === currentPage });
+      }
+    } else {
+      if (currentPage <= 3) {
+        // Primeiras páginas
+        for (let i = 1; i <= 4; i++) {
+          items.push({ number: i.toString(), active: i === currentPage });
+        }
+        items.push({ number: "...", active: false });
+        items.push({ number: totalPages.toString(), active: false });
+      } else if (currentPage >= totalPages - 2) {
+        // Últimas páginas
+        items.push({ number: "1", active: false });
+        items.push({ number: "...", active: false });
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          items.push({ number: i.toString(), active: i === currentPage });
+        }
+      } else {
+        // Páginas do meio
+        items.push({ number: "1", active: false });
+        items.push({ number: "...", active: false });
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          items.push({ number: i.toString(), active: i === currentPage });
+        }
+        items.push({ number: "...", active: false });
+        items.push({ number: totalPages.toString(), active: false });
+      }
+    }
+
+    return items;
+  };
+
+  function onTypeChange(value: string | undefined) {
+    if (value) {
+      setTypeFilter(value);
+      setCurrentPage(1);
+    }
+  }
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-t-primarymobi border-gray-200 rounded-full animate-spin"></div>
+      </div>
+    );
+
+  return (
+    <div className="flex flex-col items-start gap-6 flex-1 self-stretch grow mt-6 w-full">
+      <div className="flex items-center justify-end md:gap-6 relative flex-1 self-stretch w-full grow">
+        <div className="flex flex-col items-start gap-6 w-full">
+          <div className="flex gap-2 md:gap-6 w-full">
+            <Card className="flex-1 min-h-[70px] bg-primaryblack rounded-lg border-0 p-4 md:p-6">
+              <CardContent className="flex-row md:flex w-full md:items-center md:justify-between p-0 space-y-4 md:space-y-0">
+                <div className="text-greyscale-40 font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto text-left">
+                  <span>Saldo atual</span>
+                </div>
+                <div className="text-white font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
+                  <div className="flex justify-start items-center space-x-1">
+                    <SaqueDialog cpf={cpf} saldo={saldo} />
+                    <span>{formatMoney(saldo)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="flex-1 min-h-[70px] bg-primaryblack rounded-lg border-0 p-4 md:p-6">
+              <CardContent className="flex-row md:flex w-full md:items-center md:justify-between p-0 space-y-4 md:space-y-0">
+                <div className="text-greyscale-40 font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto text-left">
+                  <span>Todas as entradas</span>
+                </div>
+                <div className="text-supportgreen font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
+                  <div className="flex justify-start items-center space-x-1">
+                    <span>{totalEntradas}</span>
+                  </div>
+                </div>
+              </CardContent>
+              <CardContent className="flex-row md:flex w-full md:items-center md:justify-between p-0 space-y-4 md:space-y-0">
+                <div className="text-greyscale-40 font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto text-left">
+                  <span>Todas as saídas</span>
+                </div>
+                <div className="text-supportred font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
+                  <div className="flex justify-start items-center space-x-1">
+                    <span>{totalSaidas}</span>
+                  </div>
+                </div>
+              </CardContent>
+              <CardContent className="flex-row md:flex w-full md:items-center md:justify-between p-0 space-y-4 md:space-y-0">
+                <div className="text-greyscale-40 font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto text-left">
+                  <span>Total</span>
+                </div>
+                <div className="text-white font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
+                  <div className="flex justify-start items-center space-x-1">
+                    <span>{formatMoney(saldo)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex items-center justify-end gap-6 relative self-stretch w-full flex-[0_0_auto]">
+            <div className="flex flex-col items-start gap-1 relative flex-1 grow min-w-30">
+              <div className="flex h-11 items-center gap-2 px-4 py-3 relative self-stretch w-full bg-primarywhite rounded-sm border border-solid border-greyscale-30">
+                <div className="flex flex-col items-start justify-center gap-2 relative flex-1 grow">
+                  <Input
+                    placeholder="Pesquise por nome"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="relative self-stretch mt-[-1.00px] font-h4 font-[number:var(--h4-font-weight)] text-black text-[length:var(--h4-font-size)] tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical] [font-style:var(--h4-font-style)] border-0 p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0"
+                  />
+                </div>
+
+                <Search className="!relative !w-4 !h-4" />
+              </div>
+            </div>
+            <div className="hidden md:flex w-[372px] items-center gap-2 relative">
+              <DatePicker
+                id="data-inicial"
+                placeholder="Data de início"
+                dateValue={dataInicial}
+                onDateChange={setDataInicial}
+              />
+              <DatePicker
+                id="data-final"
+                placeholder="Data de término"
+                dateValue={dataFinal}
+                onDateChange={setDataFinal}
+              />
+            </div>
+
+            <div className="hidden md:flex">
+              <StringToggleGroup
+                options={typeOptions}
+                filter={typeFilter}
+                onChange={onTypeChange}
+              />
+            </div>
+
+            <div className="flex md:hidden w-[103px]">
+              <ExtratoSheet
+                typeFilter={typeFilter}
+                onTypeChange={onTypeChange}
+                typeOptions={typeOptions}
+                dataInicial={dataInicial}
+                setDataInicial={setDataInicial}
+                dataFinal={dataFinal}
+                setDataFinal={setDataFinal}
+              />
+            </div>
+          </div>
+          <Card className="flex-col items-end gap-4 self-stretch w-full flex min-h-[70px] p-4 md:p-6 relative flex-1 grow bg-primaryblack rounded-lg overflow-hidden border-0">
+            <CardContent className="w-full p-0">
+              <div className="relative self-stretch mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-greyscale-40 text-[11px] md:text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)] mb-4">
+                {filteredTableData.length} movimentos
+              </div>
+
+              <div className="overflow-x-auto">
+                <Table className="w-full min-w-[240px] md:min-w-full">
+                  <TableHeader>
+                    <TableRow className="flex items-start justify-between pt-0 pb-2 px-0 relative self-stretch w-full flex-[0_0_auto] border-b [border-bottom-style:solid] border-greyscale-70 hover:bg-transparent">
+                      <TableHead className="w-[30%] min-w-[40px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
+                        Data
+                      </TableHead>
+                      <TableHead className="w-[50%] min-w-[120px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
+                        Descrição
+                      </TableHead>
+                      <TableHead className="w-[20%] min-w-[70px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)] text-right">
+                        Valor
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {currentTableData.map((transaction, index) => {
+                      const valueColor =
+                        transaction.type === "entrada"
+                          ? "text-supportgreen"
+                          : "text-supportred";
+                      return (
+                        <TableRow
+                          key={index}
+                          className="flex items-center justify-between px-0 py-3 relative self-stretch w-full flex-[0_0_auto] border-0 hover:bg-transparent"
+                        >
+                          <TableCell className="w-[30%] min-w-[40px] px-1 md:px-2 py-3 text-white text-xs md:text-sm">
+                            <span className="md:hidden">
+                              {formatDateMobile(transaction.date)}
+                            </span>
+                            <span className="hidden md:inline">
+                              {formatDate(transaction.date)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="w-[50%] min-w-[120px] px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
+                            {transaction.description}
+                          </TableCell>
+                          <TableCell
+                            className={`w-[20%] min-w-[70px] px-1 md:px-2 py-3 text-xs md:text-sm text-right font-bold ${valueColor}`}
+                          >
+                            {transaction.value}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <Pagination className="inline-flex items-end justify-end gap-1 relative flex-[0_0_auto] mb-[-11.38px] mt-4">
+                <PaginationContent className="flex items-center gap-1">
+                  {getPaginationItems().map((item, index) => (
+                    <PaginationItem key={index}>
+                      {item.number === "..." ? (
+                        <div className="flex items-center justify-center h-8 w-8 text-white">
+                          {item.number}
+                        </div>
+                      ) : (
+                        <PaginationLink
+                          className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg ${
+                            item.active
+                              ? "bg-primarymobi text-primaryblack"
+                              : "text-white hover:bg-greyscale-70"
+                          }`}
+                          onClick={() =>
+                            handlePageChange(parseInt(item.number))
+                          }
+                        >
+                          <div className="relative w-fit mt-[-3.50px] mb-[-1.50px] font-h2 font-[number:var(--h2-font-weight)] text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)]">
+                            {item.number}
+                          </div>
+                        </PaginationLink>
+                      )}
+                    </PaginationItem>
+                  ))}
+                </PaginationContent>
+              </Pagination>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
