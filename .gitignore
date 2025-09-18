@@ -1,0 +1,7 @@
+# Dependências
+node_modules/
+.pnpm/
+.pnpm-store/
+.pnpm-debug.log
+.npm/
+.yarn/
