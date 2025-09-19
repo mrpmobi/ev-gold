@@ -9,16 +9,11 @@ import type { User } from "./lib/api"; // Importa o tipo User
 
 type AppState = "login" | "dashboard" | "cadastro";
 
-interface UserAdditionalData {
-  userData: User;
-  patrocinador: User | null;
-}
-
 export default function HomePage() {
   const [currentView, setCurrentView] = useState<AppState>("login");
   const [userEmail, setUserEmail] = useState("");
   const [currentUser, setCurrentUser] = useState<User | null>(null); // Define o tipo para currentUser
-  const [userData, setUserData] = useState<UserAdditionalData | null>(null);
+  const [userData, setUserData] = useState<User | null>(null);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -40,9 +35,9 @@ export default function HomePage() {
     checkAuth();
   }, []);
 
-  const handleLogin = (email: string, loginData: UserAdditionalData) => {
+  const handleLogin = (email: string, loginData: User) => {
     setUserEmail(email);
-    setCurrentUser(loginData.userData);
+    setCurrentUser(loginData);
     setUserData(loginData);
     setCurrentView("dashboard");
 

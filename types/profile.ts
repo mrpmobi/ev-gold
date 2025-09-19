@@ -29,3 +29,16 @@ export interface ApiError {
   success: boolean;
   message: string;
 }
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  mobile: string;
+  pai?: number;
+  downlines?: User[];
+  totalConsultores?: number;
+  diretos?: number;
+  profundidade?: number;
+  nivel?: number;
+}

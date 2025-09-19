@@ -67,50 +67,21 @@ export default function LoginComponent({
       });
 
       if (result.success && result.data && result.access_token) {
-        const userDetailsResult = await apiService.findUserByEmail(
-          formData.email,
-          result.access_token
-        );
-
-        if (userDetailsResult.success && userDetailsResult.data) {
-          const actualUser =
-            (userDetailsResult.data as any).usuario || userDetailsResult.data;
-
-          if (actualUser && actualUser.id) {
-            const userFullData = await loadUserData(
-              actualUser.id,
-              result.access_token
-            );
-
-            authManager.saveAuth(
-              actualUser,
-              result.access_token,
-              result.data.expires_in,
-              result.data.token_type
-            );
-
-            // Tracking do Meta Pixel
-            if (typeof window !== "undefined" && (window as any).fbq) {
-              (window as any).fbq("track", "CompleteRegistration");
-            }
-
-            onLogin(actualUser.email, {
-              ...actualUser,
-              ...userFullData,
-            });
-          } else {
-            setError(
-              "Erro ao obter dados completos do usuário. Tente novamente."
-            );
-            authManager.clearAuth();
-          }
-        } else {
-          setError(
-            userDetailsResult.message ||
-              "Erro ao obter dados do usuário. Tente novamente."
+          authManager.saveAuth(
+            result.data.user,
+            result.access_token,
+            result.data.expires_in,
+            result.data.token_type
           );
-          authManager.clearAuth();
-        }
+
+          // Tracking do Meta Pixel
+          if (typeof window !== "undefined" && (window as any).fbq) {
+            (window as any).fbq("track", "CompleteRegistration");
+          }
+
+          onLogin(result.data.user.email, {
+            ...result.data.user,
+          });
       } else {
         setError(
           result.message || "Email ou senha inválidos. Tente novamente."

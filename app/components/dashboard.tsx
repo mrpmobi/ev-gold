@@ -6,11 +6,7 @@ import { HeaderPanel } from "./header-panel";
 import { AppSidebar } from "./app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SaldoCard } from "./saldo-card";
-import { Banner } from "./banner";
 import { PatrociniosCard } from "./patrocinios-card";
-import { DiretosCard } from "./diretos-card";
-import { LinkCard } from "./link-card";
-import { BaixarAppCard } from "./baixar-app-card";
 import { Redes } from "./redes";
 import { Extrato } from "./extrato";
 import { Perfil } from "./perfil";
@@ -31,8 +27,6 @@ export default function DashboardComponent({
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [currentPage, setCurrentPage] = useState("home");
   const [saldo, setSaldo] = useState("0.00");
-  const urlBase = window.location.origin;
-  const linkConvite = `${urlBase}/register/${currentUser?.id || 0}`;
   const [downlines, setDownlines] = useState<Downline[]>([]);
 
   useEffect(() => {

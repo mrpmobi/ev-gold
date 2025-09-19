@@ -1,3 +1,5 @@
+import { User } from "@/types/profile";
+
 const API_BASE_URL = "https://ti.mrpmobi.com.br/api/v1";
 
 interface LoginRequest {
@@ -31,19 +33,6 @@ interface ApiResponse<T> {
   data?: T;
   message?: string;
   access_token?: string;
-}
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  mobile: string;
-  pai?: number;
-  downlines?: User[];
-  totalConsultores?: number;
-  diretos?: number;
-  profundidade?: number;
-  nivel?: number;
 }
 
 class ApiService {

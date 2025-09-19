@@ -7,13 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import PageHeader from "@/app/register/PageHeader";
-import Patrocinador from "../Patrocinador";
 import { useRouter } from "next/navigation";
 import { formatCel, formatCpf, formatName } from "@/utils/formatters";
 import { validarCPF } from "@/utils/validators";
 import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
+import { apiService } from "@/lib/api";
 
 const API_BASE = "https://ti.mrpmobi.com.br";
 const TOKEN =
@@ -21,14 +20,18 @@ const TOKEN =
 
 export default function RegisterPage() {
   const params = useParams();
-  const patrocinadorId = Array.isArray(params.patrocinadorId) ? params.patrocinadorId[0] : params.patrocinadorId;
+  const patrocinadorId = Array.isArray(params.patrocinadorId)
+    ? params.patrocinadorId[0]
+    : params.patrocinadorId;
 
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const [patrocinador, setPatrocinador] = useState<{ id: number; nome: string } | null>(null);
+  const [patrocinador, setPatrocinador] = useState<{
+    id: number;
+    nome: string;
+  } | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    mobile: "",
     cpf: "",
     password: "",
     password_confirmation: "",
@@ -92,7 +95,7 @@ export default function RegisterPage() {
         SetStepFields(["name", "cpf"]);
         break;
       case 2:
-        SetStepFields(["email", "mobile"]);
+        SetStepFields(["email"]);
         break;
       case 3:
         SetStepFields(["password", "password_confirmation"]);
@@ -119,13 +122,15 @@ export default function RegisterPage() {
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = "Nome obrigatório";
-    if (!formData.email.includes("@") && activeStep == 2) newErrors.email = "E-mail inválido";
-    if (!formData.email.includes(".") && activeStep == 2) newErrors.email = "E-mail inválido";
-    const mobileSemMascara = formData.mobile.replace(/\D/g, "");
-    if (!mobileSemMascara.match(/^\d{11,}$/) && activeStep == 2) newErrors.mobile = "Celular inválido";
+    if (!formData.email.includes("@") && activeStep == 2)
+      newErrors.email = "E-mail inválido";
+    if (!formData.email.includes(".") && activeStep == 2)
+      newErrors.email = "E-mail inválido";
     if (!validarCPF(formData.cpf)) newErrors.cpf = "CPF inválido";
-    if (formData.password.length < 8 && activeStep == 3) newErrors.password = "Mínimo 8 caracteres";
-    if (formData.password_confirmation !== formData.password && activeStep == 3) newErrors.password_confirmation = "As senhas não conferem";
+    if (formData.password.length < 8 && activeStep == 3)
+      newErrors.password = "Mínimo 8 caracteres";
+    if (formData.password_confirmation !== formData.password && activeStep == 3)
+      newErrors.password_confirmation = "As senhas não conferem";
     return newErrors;
   };
 
@@ -143,43 +148,33 @@ export default function RegisterPage() {
 
     const payload: any = {
       ...formData,
-      consultor_cpf: formData.cpf.replace(/\D/g, ""),
-      device_token: "token123",
-      country: "+55",
-      lang: "pt",
-      uuid: crypto.randomUUID(),
-      pai: patrocinador?.id || Number(patrocinadorId),
+      patrocinador_id: patrocinador?.id || Number(patrocinadorId),
     };
 
     delete payload.cpf;
 
     try {
-      const res = await fetch(`${API_BASE}/api/v1/user/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${TOKEN}`,
-        },
-        body: JSON.stringify(payload),
+      const result = await apiService.register({
+        nome: payload.name,
+        email: formData.email,
+        senha: formData.password,
+        patrocinador_id: Number.parseInt(patrocinadorId || "1"),
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (result.success && result.data) {
         toast.success("Cadastro realizado com sucesso!");
         setFormData({
           name: "",
           email: "",
-          mobile: "",
           cpf: "",
           password: "",
           password_confirmation: "",
         });
 
-        router.push("https://convite.mrpmobi.com.br");
+        router.push("https://ev.mrpgold.com.br/");
       } else {
         //console.log("Erro no cadastro:", data);
-        toast.error(data.message || "Erro ao cadastrar.");
+        toast.error(result.message || "Erro ao cadastrar.");
       }
     } catch (err) {
       //console.error("Erro na requisição:", err);
@@ -189,11 +184,12 @@ export default function RegisterPage() {
     }
   };
   return (
-    <div className="flex flex-col h-[800px] items-center justify-center gap-4 p-6 relative border border-solid border-greyscale-40 bg-[linear-gradient(180deg,rgba(29,29,29,1)_0%,rgba(15,15,15,1)_100%)]">
-      <img className="w-[1366px] left-0 absolute h-[800px] top-0" alt="Group" src="/login-foreground-2.svg" />
-
-      <img className="w-[1174px] left-48 absolute h-[800px] top-0" alt="Group" src="/login-foreground-1.svg" />
-
+    <div className="flex flex-col h-screen items-center justify-center gap-4 p-6 relative bg-[linear-gradient(180deg,rgba(29,29,29,1)_0%,rgba(15,15,15,1)_100%)]">
+      <img
+        className="absolute w-[124px] h-11 top-14 left-14 aspect-[2.82]"
+        alt="Gold MRP"
+        src="/crown.svg"
+      />
       <div className="inline-flex flex-col items-start gap-2 relative flex-[0_0_auto]">
         <Card className="w-[400px] min-h-[70px] bg-[#ffffff0d] rounded-2xl border border-solid border-greyscale-70 backdrop-blur-[5.85px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(5.85px)_brightness(100%)]">
           <CardContent className="gap-6 px-8 py-10 flex flex-col items-center justify-center">
@@ -208,7 +204,7 @@ export default function RegisterPage() {
                 <div
                   key={index}
                   className={`flex flex-col items-center justify-center gap-2.5 px-0 py-1 relative flex-1 grow border-b [border-bottom-style:solid] ${
-                    step.isActive ? "bg-[#ff842a1a] border-primarymobi" : "border-greyscale-70"
+                    step.isActive ? "bg-[#ff842a1a]" : "border-greyscale-70"
                   }`}
                 >
                   <div
@@ -222,9 +218,15 @@ export default function RegisterPage() {
               ))}
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]"
+            >
               {stepFields.map((field) => (
-                <div key={field} className="flex flex-col items-start gap-1 relative self-stretch w-full flex-[0_0_auto]">
+                <div
+                  key={field}
+                  className="flex flex-col items-start gap-1 relative self-stretch w-full flex-[0_0_auto]"
+                >
                   {(formData as any)[field] ? (
                     <Label
                       htmlFor={field}
@@ -234,7 +236,6 @@ export default function RegisterPage() {
                         {
                           name: "Nome completo",
                           email: "Seu melhor e-mail",
-                          mobile: "Seu melhor telefone",
                           cpf: "CPF",
                           password: "Senha",
                           password_confirmation: "Confirmar senha",
@@ -245,14 +246,19 @@ export default function RegisterPage() {
                   <Input
                     id={field}
                     name={field}
-                    type={field.includes("password") ? "password" : field === "email" ? "email" : "text"}
+                    type={
+                      field.includes("password")
+                        ? "password"
+                        : field === "email"
+                        ? "email"
+                        : "text"
+                    }
                     value={(formData as any)[field]}
                     onChange={handleChange}
                     placeholder={
                       {
                         name: "Nome completo",
                         email: "Seu melhor e-mail",
-                        mobile: "Seu melhor telefone",
                         cpf: "CPF",
                         password: "Senha",
                         password_confirmation: "Confirmar senha",
@@ -261,14 +267,16 @@ export default function RegisterPage() {
                     autoComplete="off"
                     className="border-greyscale-30 flex h-11 items-center gap-2 px-4 py-3 relative self-stretch w-full bg-primarywhite rounded-sm border border-solid font-h4 font-[number:var(--h4-font-weight)] text-black text-[length:var(--h4-font-size)] tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] [font-style:var(--h4-font-style)]"
                   />
-                  {errors[field] && <p className="text-sm text-red-500 mt-1">{errors[field]}</p>}
+                  {errors[field] && (
+                    <p className="text-sm text-red-500 mt-1">{errors[field]}</p>
+                  )}
                 </div>
               ))}
 
               <Button
                 className="
-              self-stretch w-full bg-primarymobi flex items-center justify-center gap-1 px-4 py-3 
-              relative flex-[0_0_auto] rounded-sm h-auto hover:bg-primarymobi/90"
+              self-stretch w-full flex items-center justify-center gap-1 px-4 py-3 
+              relative flex-[0_0_auto] rounded-sm h-auto"
                 type={activeStep === 3 ? "submit" : "button"}
                 onClick={avancaStep}
               >
@@ -295,8 +303,6 @@ export default function RegisterPage() {
           </CardContent>
         </Card>
 
-        <img className="relative self-stretch w-full h-[1.66px] ml-[-0.17px]" alt="Vector" src="" />
-
         <Card className="w-[400px] min-h-[70px] bg-[#ffffff0d] rounded-2xl border border-solid border-greyscale-70 backdrop-blur-[5.85px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(5.85px)_brightness(100%)]">
           <CardContent className="gap-2 px-8 py-6 flex flex-col items-center justify-center">
             <div className="flex items-center justify-center gap-2.5 relative self-stretch w-full flex-[0_0_auto]">
@@ -306,11 +312,11 @@ export default function RegisterPage() {
             </div>
 
             <Link href="/">
-              <Button 
-              className="w-[336px] bg-greyscale-90 border border-solid border-greyscale-80 
+              <Button
+                className="w-[336px] bg-greyscale-90 border border-solid border-greyscale-80 
               flex items-center justify-center gap-1 px-4 py-3 relative flex-[0_0_auto] rounded-sm 
               h-auto hover:bg-greyscale-90/90"
-              onClick={() => window.location.reload()}
+                onClick={() => window.location.reload()}
               >
                 <div className="relative w-fit mt-[-1.00px] font-h3 font-[number:var(--h3-font-weight)] text-white text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
                   Ir para Login
@@ -320,8 +326,6 @@ export default function RegisterPage() {
           </CardContent>
         </Card>
       </div>
-
-      <img className="absolute w-[124px] h-11 top-14 left-14 aspect-[2.82]" alt="Mrp mobi completo" src="/mobi.svg" />
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { User } from "@/types/profile";
+
 export const API_BASE_URL = "https://app.mrpgold.com.br/api";
 //export const API_BASE_URL = "http://127.0.0.1:8000/api/v1"
 
@@ -7,17 +9,10 @@ interface LoginRequest {
 }
 
 interface RegisterRequest {
-  name: string;
+  nome: string;
   email: string;
-  password: string;
-  password_confirmation: string;
-  mobile: string;
-  device_token: string;
-  login_by: string;
-  country: string;
-  lang: string;
-  uuid: string;
-  pai: number;
+  senha: string;
+  patrocinador_id: number;
 }
 
 interface LoginResponse {
@@ -32,19 +27,6 @@ interface ApiResponse<T> {
   data?: T;
   message?: string;
   access_token?: string;
-}
-
-interface User {
-  id: number;
-  name: string; // Propriedade esperada para o nome
-  email: string;
-  mobile: string;
-  pai?: number;
-  downlines?: [];
-  totalConsultores?: number;
-  diretos?: number;
-  profundidade?: number;
-  nivel?: number;
 }
 
 interface Downline {
@@ -102,7 +84,7 @@ class ApiService {
 
   async register(userData: RegisterRequest): Promise<ApiResponse<any>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/user/register`, {
+      const response = await fetch(`${API_BASE_URL}/user/cadastro`, {
         method: "POST",
         headers: this.getHeaders(),
         body: JSON.stringify(userData),

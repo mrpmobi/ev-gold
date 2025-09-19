@@ -141,14 +141,7 @@ export default function CadastroComponent({
       const result = await apiService.register({
         name: formData.nomeCompleto,
         email: formData.email,
-        password: formData.senha,
-        password_confirmation: formData.confirmarSenha,
-        mobile: cleanPhone(formData.celular),
-        device_token: generateDeviceToken(),
-        login_by: "web",
-        country: "+55",
-        lang: "pt",
-        uuid: generateUUID(),
+        senha: formData.senha,
         pai: Number.parseInt(patrocinadorId || "1"),
       });
 
