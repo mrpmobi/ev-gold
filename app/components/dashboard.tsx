@@ -14,7 +14,7 @@ import { API_BASE_URL } from "@/lib/api";
 
 interface DashboardComponentProps {
   userEmail: string;
-  onLogout: () => void;
+  onLogout: (token: string) => void;
   currentUser: User | null;
 }
 
@@ -116,8 +116,8 @@ export default function DashboardComponent({
   }, [currentUser, downlines]);
 
   const handleLogout = () => {
-    authManager.clearAuth();
-    onLogout();
+    const token = authManager.getToken();
+    if (token) onLogout(token);
   };
 
   const [downlinesAllCount, setDownlinesAllCount] = useState<number>(0);

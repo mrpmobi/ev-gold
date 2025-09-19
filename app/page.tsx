@@ -29,6 +29,19 @@ export default function HomePage() {
     }
   };
 
+  const logout = async (token: string) => {
+    try {
+      const res = await apiService.logout(token);
+      if (res.success && res.data) {
+        return res.data;
+      }
+    } catch (error) {
+      //console.error("Erro ao carregar dados do usuário:", error);
+      throw error;
+    } finally {
+    }
+  };
+
   useEffect(() => {
     const checkAuth = async () => {
       const auth = authManager.getAuth();
@@ -69,7 +82,9 @@ export default function HomePage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async (token: string) => {
+    const apiLogout = await logout(token);
+    if (apiLogout) console.log(apiLogout);
     authManager.clearAuth();
     setCurrentView("login");
     setUserEmail("");

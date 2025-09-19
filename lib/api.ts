@@ -371,6 +371,37 @@ class ApiService {
       };
     }
   }
+
+  async logout(token: string): Promise<ApiResponse<boolean>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/logout`, {
+        method: "POST",
+        headers: this.getHeaders(true, token),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Erro HTTP: ${response.status}`);
+      }
+
+      if (data && data.message) {
+        return {
+          success: true,
+          data: data.message,
+        };
+      } else {
+        throw new Error("Formato de resposta inesperado para logout");
+      }
+    } catch (error) {
+      //console.error("API: Erro ao buscar usuário por email:", error);
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Falha ao realizar logout",
+      };
+    }
+  }
 }
 
 export const apiService = new ApiService();
