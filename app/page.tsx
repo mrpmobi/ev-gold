@@ -6,6 +6,7 @@ import DashboardComponent from "./components/dashboard";
 import CadastroComponent from "./components/cadastro";
 import { authManager } from "./lib/auth";
 import type { User } from "./lib/api"; // Importa o tipo User
+import { apiService } from "@/lib/api";
 
 type AppState = "login" | "dashboard" | "cadastro";
 
@@ -15,15 +16,36 @@ export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null); // Define o tipo para currentUser
   const [userData, setUserData] = useState<User | null>(null);
 
+  const refreshToken = async (token: string) => {
+    try {
+      const refreshResult = await apiService.refresh(token);
+      if (refreshResult.success && refreshResult.data) {
+        return refreshResult.data;
+      }
+    } catch (error) {
+      //console.error("Erro ao carregar dados do usuário:", error);
+      throw error;
+    } finally {
+    }
+  };
+
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       const auth = authManager.getAuth();
 
       if (auth && auth.user && auth.user.id) {
-        // Adiciona verificação para auth.user.id
-        setUserEmail(auth.user.email);
-        setCurrentUser(auth.user);
-        setCurrentView("dashboard");
+        const refresh = await refreshToken(auth?.token);
+
+        if (refresh) {
+          setUserEmail(auth.user.email);
+          setCurrentUser(auth.user);
+          setCurrentView("dashboard");
+        } else {
+          setCurrentView("login");
+          setUserEmail("");
+          setCurrentUser(null);
+          authManager.clearAuth();
+        }
       } else {
         setCurrentView("login");
         setUserEmail("");

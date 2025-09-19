@@ -220,8 +220,8 @@ class ApiService {
         data = await response.json();
       } catch (parseError) {
         //console.error(
-          //`API: Não foi possível fazer parse do JSON dos downlines para ${userId}:`,
-          //parseError
+        //`API: Não foi possível fazer parse do JSON dos downlines para ${userId}:`,
+        //parseError
         //);
         throw new Error(
           `Erro ao processar a resposta da API (JSON inválido). Status: ${response.status}`
@@ -241,8 +241,8 @@ class ApiService {
 
       if (!Array.isArray(downlinesData)) {
         //console.error(
-          //`API: Resposta inesperada para getUserDownlines de ${userId}:`,
-          //data
+        //`API: Resposta inesperada para getUserDownlines de ${userId}:`,
+        //data
         //);
         throw new Error(
           "Formato de resposta inesperado: esperado array de downlines ou objeto com chave 'downlines'."
@@ -340,7 +340,45 @@ class ApiService {
       };
     }
   }
+
+  async refresh(token: string): Promise<ApiResponse<string>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/refresh`, {
+        method: "POST",
+        headers: this.getHeaders(true, token),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Erro HTTP: ${response.status}`);
+      }
+
+      if (data && data.token) {
+        return {
+          success: true,
+          data: data.token,
+        };
+      } else {
+        throw new Error("Formato de resposta inesperado para refresh");
+      }
+    } catch (error) {
+      //console.error("API: Erro ao buscar usuário por email:", error);
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Falha ao atualizar token",
+      };
+    }
+  }
 }
 
 export const apiService = new ApiService();
-export type { User, Downline, LoginRequest, RegisterRequest, ApiResponse, LoginResponse };
+export type {
+  User,
+  Downline,
+  LoginRequest,
+  RegisterRequest,
+  ApiResponse,
+  LoginResponse,
+};
