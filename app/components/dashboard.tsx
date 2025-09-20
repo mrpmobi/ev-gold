@@ -15,7 +15,6 @@ import { PatrociniosCard } from "./patrocinios-card";
 import { Redes } from "./redes";
 import { Extrato } from "./extrato";
 import { Perfil } from "./perfil";
-import { API_BASE_URL } from "@/lib/api";
 
 interface DashboardComponentProps {
   userEmail: string;
@@ -41,26 +40,7 @@ export default function DashboardComponent({
     const token = authManager.getToken();
     if (!token) return;
 
-    const fetchDiretos = async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE_URL}/user/${currentUser.id}/downlinesCount`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data = await res.json();
-        if (res.ok && data.diretos !== undefined) {
-          setDiretos(data.diretos);
-        } else {
-        }
-      } catch (err) {}
-    };
+    const fetchDiretos = async () => {};
 
     fetchDiretos();
   }, [currentUser]);
@@ -92,19 +72,16 @@ export default function DashboardComponent({
 
   useEffect(() => {
     //setSaldo("Carregando");
-    async function fetchSaldo() {
+    const token = authManager.getToken();
+    if (!token || !currentUser) return;
+    const fetchSaldo = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/userwallet-get`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authManager.getToken()}`,
-          },
-        });
-        const data = await response.json();
-        setSaldo(data.data.amount_balance);
+        const response = await apiService.getExtrato(token);
+        if (response.success && response.data) {
+          setSaldo(response.data.saldo.total);
+        }
       } catch (error) {}
-    }
+    };
 
     fetchSaldo();
   }, [currentUser]);
@@ -112,7 +89,7 @@ export default function DashboardComponent({
   useEffect(() => {
     if (currentUser?.nivel !== undefined) {
       const downlinesDiretos = downlines.filter(
-        (user) => user.nivel === currentUser.nivel
+        (user) => user.nivel_relativo === currentUser.nivel
       ).length;
       setDiretos(downlinesDiretos);
     }

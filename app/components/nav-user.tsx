@@ -31,7 +31,7 @@ export function NavUser({ name, handleLogout, setCurrentPage }: NavUserProps) {
           <div className="px-0 md:px-2 w-auto flex flex-row items-center gap-2 md:gap-4 text-[#C0C0C0] group-hover:text-[#121212]">
             <span className="hidden lg:inline text-sm">{name}</span>
             <Avatar>
-              <AvatarImage src="/path-to-avatar" />
+              <AvatarImage src="" />
               <AvatarFallback className="bg-[#C0C0C0] border-[#C0C0C0] text-[#121212] text-sm">{getInitials(name)}</AvatarFallback>
             </Avatar>
           </div>

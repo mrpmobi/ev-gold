@@ -46,10 +46,9 @@ interface DownlinesResponse {
 
 interface Downline {
   id: number;
-  name: string;
-  email: string;
-  nivel: number;
-  posicao: string;
+  nome: string;
+  nivel_relativo: number;
+  created_at: string
 }
 
 class ApiService {
@@ -215,10 +214,10 @@ class ApiService {
   }
 
   async getUserDownlines(
-    token: string
+    token: string, queryParams?: URLSearchParams
   ): Promise<ApiResponse<DownlinesResponse>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/user/downlines`, {
+      const response = await fetch(`${API_BASE_URL}/user/downlines?${queryParams?.toString()}`, {
         method: "GET",
         headers: this.getHeaders(true, token),
       });
@@ -390,9 +389,9 @@ class ApiService {
     }
   }
 
-  async getExtrato(token: string, queryParams?: URLSearchParams): Promise<ApiResponse<ExtratoResponse>> {
+  async getExtrato(token: string): Promise<ApiResponse<ExtratoResponse>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/saldo/get?${queryParams?.toString()}`, {
+      const response = await fetch(`${API_BASE_URL}/saldo/get`, {
         method: "GET",
         headers: this.getHeaders(true, token),
       });

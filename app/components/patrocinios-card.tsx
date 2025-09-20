@@ -97,7 +97,7 @@ export function PatrociniosCard({
                 <TableRow
                   className="
                 "
-                  key={downline.name}
+                  key={downline.nome}
                 >
                   <TableCell
                     className="relative w-[178px] mt-[-1.00px] font-h4 font-[number:var(--h4-font-weight)]
@@ -105,7 +105,7 @@ export function PatrociniosCard({
                  leading-[var(--h4-line-height)] overflow-hidden text-ellipsis [display:-webkit-box]
                   [-webkit-line-clamp:1] [-webkit-box-orient:vertical] [font-style:var(--h4-font-style)]"
                   >
-                    {downline.name}
+                    {downline.nome}
                   </TableCell>
                   <TableCell
                     className="relative w-7 mt-[-1.00px] font-h4 font-[number:var(--h4-font-weight)]
@@ -113,7 +113,7 @@ export function PatrociniosCard({
                    tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] 
                    [font-style:var(--h4-font-style)]"
                   >
-                    {downline.nivel}
+                    {downline.nivel_relativo}
                   </TableCell>
                   <TableCell
                     className="relative w-[103px] mt-[-1.00px] font-h4 font-[number:var(--h4-font-weight)]
@@ -129,7 +129,10 @@ export function PatrociniosCard({
                    tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] 
                    [font-style:var(--h4-font-style)]"
                   >
-                    {formatMoney(downline.total_valor.toString())}
+                    {
+                      formatMoney("0")
+                      //formatMoney(downline.total_valor.toString())
+                    }
                   </TableCell>
                 </TableRow>
               ))}

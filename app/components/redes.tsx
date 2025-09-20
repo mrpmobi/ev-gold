@@ -54,34 +54,22 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const itemsPerPage = 9;
+  const itemsPerPage = 20; // Alterado para 20 itens por página
 
-  const fetchDownlines = useCallback(async () => {
+  const fetchDownlines = async () => {
     try {
       setIsLoading(true);
       const token = authManager.getToken();
       if (!token) return;
 
       const queryParams = new URLSearchParams();
-      const offset = (currentPage - 1) * itemsPerPage;
-
-      
-      queryParams.append("offset", offset.toString());
 
       if (levelFilter !== "todos") {
         queryParams.append("nivel", levelFilter);
       }
 
-      /*
-      if (timeFilter !== "sempre") {
-        queryParams.append("time", timeFilter);
-      }
-
-      queryParams.append("limit", itemsPerPage.toString());
-      */
-
       if (searchTerm) {
-        queryParams.append("name", searchTerm);
+        queryParams.append("nome", searchTerm);
       }
 
       const res = await apiService.getUserDownlines(token);
@@ -89,9 +77,9 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
       if (res.success && res.data) {
         setDownlines(res.data.downlines || []);
         const somaTotal = Object.values(res.data.contagem_por_nivel).reduce(
-            (total, valor) => total + valor,
-            0
-          );
+          (total: number, valor: number) => total + valor,
+          0
+        );
         setTotalCount(somaTotal);
       } else {
         console.error("Failed to fetch downlines:", res.data);
@@ -105,47 +93,52 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, levelFilter, timeFilter, searchTerm, itemsPerPage]);
+  }; // Removidas dependências desnecessárias
 
   useEffect(() => {
     fetchDownlines();
-  }, [fetchDownlines]);
+  }, [levelFilter, searchTerm]);
+
+  // Obter os downlines da página atual (paginação no frontend)
+  const currentPageData = useMemo(() => {
+    if (!Array.isArray(downlines) || downlines.length === 0) return [];
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return downlines.slice(startIndex, endIndex);
+  }, [downlines, currentPage, itemsPerPage]);
 
   const statsData = [
     { label: "Total de patrocínios", value: downlinesAllCount },
     {
       label: "Total de ganhos",
-      value: 0, /*formatMoney(
-        downlines
-          .reduce((total, downline) => total + (downline.total_valor || 0), 0)
-          .toString()
-      ),*/
+      value: 0,
     },
   ];
 
   const tableData = useMemo(() => {
-    return downlines.map((downline) => ({
+    return currentPageData.map((downline) => ({
       id: downline.id,
-      name: downline.name,
-      level: downline.nivel,
+      nome: downline.nome,
+      level: downline.nivel_relativo,
       levelBg:
-        downline.nivel === 1
+        downline.nivel_relativo === 1
           ? "bg-primary"
-          : downline.nivel === 2
+          : downline.nivel_relativo === 2
           ? "bg-greyscale-70"
           : "bg-greyscale-40",
       levelText:
-        downline.nivel === 1
+        downline.nivel_relativo === 1
           ? "text-primaryblack"
-          : downline.nivel === 2
+          : downline.nivel_relativo === 2
           ? "text-white"
           : "text-primaryblack",
-      date: "",
+      date: downline.created_at || "",
       ganhos: formatMoney("0"),
     }));
-  }, [downlines]);
+  }, [currentPageData]);
 
-  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const totalPages = Math.ceil(downlines.length / itemsPerPage);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -320,7 +313,7 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                               </TableCell>
 
                               <TableCell className="w-[35%] min-w-[100px] relative mt-[-0.50px] font-bold font-h2 text-white text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical] [font-style:var(--h2-font-style)] p-0">
-                                {row.name}
+                                {row.nome}
                               </TableCell>
 
                               <TableCell className="w-[15%] min-w-[50px] p-0 flex justify-center">

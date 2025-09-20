@@ -273,7 +273,7 @@ export function Perfil({ user, setUser }: PerfilProps) {
                 onMouseLeave={() => setIsHovered(false)}
               >
                 <Avatar className="w-20 h-20">
-                  <AvatarImage src="/path-to-avatar" />
+                  <AvatarImage src="" />
                   <AvatarFallback className="bg-[#C0C0C0] border-[#C0C0C0] text-[#121212]">
                     {getInitials(profileData.personal.name)}
                   </AvatarFallback>
