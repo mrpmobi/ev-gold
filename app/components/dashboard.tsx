@@ -1,6 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { type User, type Downline } from "@/lib/api";
+import {
+  type User,
+  type Downline,
+  type ContagemPorNivel,
+  apiService,
+} from "@/lib/api";
 import { authManager } from "@/lib/auth";
 import { HeaderPanel } from "./header-panel";
 import { AppSidebar } from "./app-sidebar";
@@ -28,6 +33,8 @@ export default function DashboardComponent({
   const [currentPage, setCurrentPage] = useState("home");
   const [saldo, setSaldo] = useState("0.00");
   const [downlines, setDownlines] = useState<Downline[]>([]);
+  const [downlinesCount, setDownlinesCount] = useState<ContagemPorNivel>({});
+  const [downlinesAllCount, setDownlinesAllCount] = useState<number>(0);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -64,23 +71,20 @@ export default function DashboardComponent({
 
     const fetchDownlines = async () => {
       try {
-        const res = await fetch(
-          `${API_BASE_URL}/office/user/downlines-by-filter?limit=3`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data = await res.json();
-        if (res.ok && data.downlines) {
-          setDownlines(data.downlines);
-        } else {
+        const res = await apiService.getUserDownlines(token);
+        if (res.success && res.data) {
+          setDownlines(res.data.downlines);
+          setDownlinesCount(res.data.contagem_por_nivel);
+          const somaTotal = Object.values(res.data.contagem_por_nivel).reduce(
+            (total, valor) => total + valor,
+            0
+          );
+          setDownlinesAllCount(somaTotal);
         }
-      } catch (err) {}
+      } catch (error) {
+        //console.error("Erro ao carregar dados do usuário:", error);
+        throw error;
+      }
     };
 
     fetchDownlines();
@@ -119,38 +123,6 @@ export default function DashboardComponent({
     const token = authManager.getToken();
     if (token) onLogout(token);
   };
-
-  const [downlinesAllCount, setDownlinesAllCount] = useState<number>(0);
-
-  useEffect(() => {
-    const fetchDownlinesCount = async () => {
-      try {
-        const userId = authManager.getUser()?.id;
-        if (!userId) return;
-
-        const token = authManager.getToken();
-        if (!token) return;
-
-        const response = await fetch(
-          `${API_BASE_URL}/user/${userId}/downlinesAllCount`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) throw new Error("Erro ao buscar patrocinios");
-
-        const data = await response.json();
-        setDownlinesAllCount(data.total ?? 0);
-      } catch (error) {}
-    };
-
-    fetchDownlinesCount();
-  }, []);
 
   return (
     <div className="bg-[#1D1D1D] flex flex-col justify-center items-start p-4 md:p-6">

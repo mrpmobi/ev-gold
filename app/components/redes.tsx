@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { API_BASE_URL, Downline } from "@/lib/api";
+import { API_BASE_URL, apiService, Downline } from "@/lib/api";
 import { formatDate, formatMoney } from "@/utils/formatters";
 import { Search } from "lucide-react";
 import React, { useState, useMemo, useEffect, useCallback } from "react";
@@ -66,40 +66,36 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
       const queryParams = new URLSearchParams();
       const offset = (currentPage - 1) * itemsPerPage;
 
-      queryParams.append("limit", itemsPerPage.toString());
+      
       queryParams.append("offset", offset.toString());
 
       if (levelFilter !== "todos") {
         queryParams.append("nivel", levelFilter);
       }
 
+      /*
       if (timeFilter !== "sempre") {
         queryParams.append("time", timeFilter);
       }
+
+      queryParams.append("limit", itemsPerPage.toString());
+      */
 
       if (searchTerm) {
         queryParams.append("name", searchTerm);
       }
 
-      const url = `${API_BASE_URL}/office/user/downlines-by-filter?${queryParams.toString()}`;
-      console.log("Fetching downlines from:", url);
+      const res = await apiService.getUserDownlines(token);
 
-      const res = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-      console.log("API response:", data);
-
-      if (res.ok) {
-        setDownlines(data.downlines || []);
-        setTotalCount(data.totalCount || data.downlines?.length || 0);
+      if (res.success && res.data) {
+        setDownlines(res.data.downlines || []);
+        const somaTotal = Object.values(res.data.contagem_por_nivel).reduce(
+            (total, valor) => total + valor,
+            0
+          );
+        setTotalCount(somaTotal);
       } else {
-        console.error("Failed to fetch downlines:", data);
+        console.error("Failed to fetch downlines:", res.data);
         setDownlines([]);
         setTotalCount(0);
       }
@@ -120,11 +116,11 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
     { label: "Total de patrocínios", value: downlinesAllCount },
     {
       label: "Total de ganhos",
-      value: formatMoney(
+      value: 0, /*formatMoney(
         downlines
           .reduce((total, downline) => total + (downline.total_valor || 0), 0)
           .toString()
-      ),
+      ),*/
     },
   ];
 
@@ -145,8 +141,8 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
           : downline.nivel === 2
           ? "text-white"
           : "text-primaryblack",
-      date: downline.created_at || "",
-      ganhos: formatMoney(downline.total_valor?.toString() || "0"),
+      date: "",
+      ganhos: formatMoney("0"),
     }));
   }, [downlines]);
 

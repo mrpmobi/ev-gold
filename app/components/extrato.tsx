@@ -72,8 +72,7 @@ export function Extrato() {
       } catch (error) {
         //console.error("Erro ao carregar dados do usuário:", error);
         throw error;
-      } finally {
-      }
+      } 
     };
 
     const fetchCPF = async () => {

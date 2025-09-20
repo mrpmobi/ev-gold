@@ -25,7 +25,7 @@ interface LoginResponse {
 interface ExtratoResponse {
   saldo: { total: string; pendente: string; moeda: string };
   extrato: [];
-  resumo: {total_transacoes: number; ultima_atualizacao: string }
+  resumo: { total_transacoes: number; ultima_atualizacao: string };
 }
 
 interface ApiResponse<T> {
@@ -35,15 +35,21 @@ interface ApiResponse<T> {
   access_token?: string;
 }
 
+interface ContagemPorNivel {
+  [nivel: number]: number;
+}
+
+interface DownlinesResponse {
+  contagem_por_nivel: ContagemPorNivel;
+  downlines: Downline[];
+}
+
 interface Downline {
   id: number;
-  name: string; // Propriedade esperada para o nome
+  name: string;
   email: string;
-  mobile: string;
-  pai: number;
   nivel: number;
-  created_at: string;
-  total_valor: number;
+  posicao: string;
 }
 
 class ApiService {
@@ -209,62 +215,37 @@ class ApiService {
   }
 
   async getUserDownlines(
-    userId: number,
     token: string
-  ): Promise<ApiResponse<User[]>> {
+  ): Promise<ApiResponse<DownlinesResponse>> {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/user/${userId}/downlinesOptimized`,
-        {
-          method: "GET",
-          headers: this.getHeaders(true, token),
-        }
-      );
-
-      let data: any;
-      try {
-        data = await response.json();
-      } catch (parseError) {
-        //console.error(
-        //`API: Não foi possível fazer parse do JSON dos downlines para ${userId}:`,
-        //parseError
-        //);
-        throw new Error(
-          `Erro ao processar a resposta da API (JSON inválido). Status: ${response.status}`
-        );
-      }
+      const response = await fetch(`${API_BASE_URL}/user/downlines`, {
+        method: "GET",
+        headers: this.getHeaders(true, token),
+      });
 
       if (!response.ok) {
-        const msg =
-          data?.message ||
-          JSON.stringify(data) ||
-          `Erro HTTP: ${response.status}`;
+        const msg = `Erro HTTP: ${response.status}`;
         throw new Error(msg);
       }
 
-      // Verifica se a resposta contém a chave 'downlines' ou se é o array direto
-      const downlinesData = data.downlines || data;
+      const data = await response.json();
 
-      if (!Array.isArray(downlinesData)) {
-        //console.error(
-        //`API: Resposta inesperada para getUserDownlines de ${userId}:`,
-        //data
-        //);
-        throw new Error(
-          "Formato de resposta inesperado: esperado array de downlines ou objeto com chave 'downlines'."
-        );
+      if (!response.ok) {
+        throw new Error(data.message || `Erro HTTP: ${response.status}`);
       }
 
-      // Mapeia cada item para garantir que 'nome' seja transformado em 'name'
-      const formattedDownlines: User[] = downlinesData.map((item: any) => ({
-        ...item,
-        name: item.nome || item.name,
-      }));
-
-      return {
-        success: true,
-        data: formattedDownlines,
-      };
+      if (
+        data &&
+        data.contagem_por_nivel &&
+        data.downlines
+      ) {
+        return {
+          success: true,
+          data: data,
+        };
+      } else {
+        throw new Error("Estrutura de dados inválida na resposta da API");
+      }
     } catch (error) {
       //console.error(`API: Erro ao buscar rede para ${userId}:`, error);
       return {
@@ -409,9 +390,9 @@ class ApiService {
     }
   }
 
-  async getExtrato(token: string): Promise<ApiResponse<ExtratoResponse>> {
+  async getExtrato(token: string, queryParams?: URLSearchParams): Promise<ApiResponse<ExtratoResponse>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/saldo/get`, {
+      const response = await fetch(`${API_BASE_URL}/saldo/get?${queryParams?.toString()}`, {
         method: "GET",
         headers: this.getHeaders(true, token),
       });
@@ -422,7 +403,14 @@ class ApiService {
         throw new Error(res.message || `Erro HTTP: ${response.status}`);
       }
 
-      if (res && res.success && res.data && res.data.extrato && res.data.resumo && res.data.saldo) {
+      if (
+        res &&
+        res.success &&
+        res.data &&
+        res.data.extrato &&
+        res.data.resumo &&
+        res.data.saldo
+      ) {
         return {
           success: true,
           data: res.data,
@@ -449,4 +437,5 @@ export type {
   RegisterRequest,
   ApiResponse,
   LoginResponse,
+  ContagemPorNivel,
 };
