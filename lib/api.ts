@@ -22,6 +22,12 @@ interface LoginResponse {
   user: User;
 }
 
+interface ExtratoResponse {
+  saldo: { total: string; pendente: string; moeda: string };
+  extrato: [];
+  resumo: {total_transacoes: number; ultima_atualizacao: string }
+}
+
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -399,6 +405,37 @@ class ApiService {
         success: false,
         message:
           error instanceof Error ? error.message : "Falha ao realizar logout",
+      };
+    }
+  }
+
+  async getExtrato(token: string): Promise<ApiResponse<ExtratoResponse>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/saldo/get`, {
+        method: "GET",
+        headers: this.getHeaders(true, token),
+      });
+
+      const res = await response.json();
+
+      if (!response.ok) {
+        throw new Error(res.message || `Erro HTTP: ${response.status}`);
+      }
+
+      if (res && res.success && res.data && res.data.extrato && res.data.resumo && res.data.saldo) {
+        return {
+          success: true,
+          data: res.data,
+        };
+      } else {
+        throw new Error("Formato de resposta inesperado para Extrato");
+      }
+    } catch (error) {
+      //console.error("API: Erro ao buscar usuário por email:", error);
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Falha ao obter extrato",
       };
     }
   }

@@ -37,17 +37,11 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
 
   return (
     <Dialog>
-      <DialogTrigger>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="gap-1 px-2 py-1 rounded-sm inline-flex items-center hover:bg-[#424242]"
-        >
-          <span className="hidden md:block text-greyscale-30 text-xs px-0">
-            Sacar
-          </span>
-          <img src="pix.svg" alt="Pix" className="w-4 h-4" />
-        </Button>
+      <DialogTrigger className="gap-1 px-2 py-1 rounded-sm inline-flex items-center hover:bg-[#424242]">
+        <span className="hidden md:block text-greyscale-30 text-xs px-0">
+          Sacar
+        </span>
+        <img src="pix.svg" alt="Pix" className="w-4 h-4" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[559px] h-[417px] flex flex-col justify-between p-10 bg-primaryblack border-0 rounded-xl overflow-hidden">
         <DialogHeader className="flex flex-row items-center justify-between w-full">

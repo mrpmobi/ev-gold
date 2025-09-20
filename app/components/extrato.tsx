@@ -22,7 +22,7 @@ import { Search } from "lucide-react";
 import { ExtratoSheet } from "./extrato-sheet";
 import { SaqueDialog } from "./saque-dialog";
 import { authManager } from "@/lib/auth";
-import { API_BASE_URL } from "@/lib/api";
+import { API_BASE_URL, apiService } from "@/lib/api";
 
 const typeOptions = [
   { value: "todos", label: "Todos" },
@@ -46,10 +46,9 @@ interface Transaction {
 }
 
 interface ExtratoProps {
-  saldo: string;
 }
 
-export function Extrato({ saldo }: ExtratoProps) {
+export function Extrato() {
   const [typeFilter, setTypeFilter] = useState("todos");
   const [dataInicial, setDataInicial] = useState<Date | undefined>(undefined);
   const [dataFinal, setDataFinal] = useState<Date | undefined>(undefined);
@@ -59,10 +58,24 @@ export function Extrato({ saldo }: ExtratoProps) {
   const [cpf, setCpf] = useState("");
   const [totalEntradas, setTotalEntradas] = useState("0,00");
   const [totalSaidas, setTotalSaidas] = useState("0,00");
+  const [saldoAtual, setSaldoAtual] = useState("0,00");
   const [initialTableData, setInitialTableData] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchExtrato = async (token: string) => {
+      try {
+        const res = await apiService.getExtrato(token);
+        if (res.success && res.data) {
+          setInitialTableData(res.data.extrato);
+        }
+      } catch (error) {
+        //console.error("Erro ao carregar dados do usuário:", error);
+        throw error;
+      } finally {
+      }
+    };
+
     const fetchCPF = async () => {
       try {
         const token = authManager.getToken();
@@ -88,6 +101,12 @@ export function Extrato({ saldo }: ExtratoProps) {
       }
     };
 
+    const auth = authManager.getAuth();
+
+    if (auth && auth.token) {
+      fetchExtrato(auth.token);
+    }
+
     fetchCPF();
   }, []);
 
@@ -108,7 +127,8 @@ export function Extrato({ saldo }: ExtratoProps) {
 
     setTotalEntradas(formatMoney(entradas));
     setTotalSaidas(formatMoney(saidas));
-    const saldoAtual = entradas - saidas;
+    const saldo = entradas - saidas;
+    setSaldoAtual(saldo.toString());
   }
 
   useEffect(() => {
@@ -217,8 +237,8 @@ export function Extrato({ saldo }: ExtratoProps) {
                 </div>
                 <div className="text-white font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
                   <div className="flex justify-start items-center space-x-1">
-                    <SaqueDialog cpf={cpf} saldo={saldo} />
-                    <span>{formatMoney(saldo)}</span>
+                    <SaqueDialog cpf={cpf} saldo={saldoAtual} />
+                    <span>{formatMoney(saldoAtual)}</span>
                   </div>
                 </div>
               </CardContent>
@@ -250,7 +270,7 @@ export function Extrato({ saldo }: ExtratoProps) {
                 </div>
                 <div className="text-white font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
                   <div className="flex justify-start items-center space-x-1">
-                    <span>{formatMoney(saldo)}</span>
+                    <span>{formatMoney(saldoAtual)}</span>
                   </div>
                 </div>
               </CardContent>

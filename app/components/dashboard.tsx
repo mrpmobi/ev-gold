@@ -190,7 +190,7 @@ export default function DashboardComponent({
           )}
           {currentPage === "extrato" && (
             <>
-              <Extrato saldo={saldo} />
+              <Extrato />
             </>
           )}
           {currentPage === "perfil" && userData && (
