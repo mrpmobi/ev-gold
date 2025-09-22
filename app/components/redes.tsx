@@ -66,7 +66,7 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
       queryParams.append("nivel", levelFilter);
 
       if (searchTerm) {
-        queryParams.append("nome", searchTerm);
+        queryParams.append("name", searchTerm);
       }
 
       const res = await apiService.getUserDownlines(token, queryParams);
