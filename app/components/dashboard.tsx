@@ -79,7 +79,7 @@ export default function DashboardComponent({
     if (!token || !currentUser) return;
     const fetchSaldo = async () => {
       try {
-        const response = await apiService.getExtrato(token);
+        const response = await apiService.getSaldo(token);
         if (response.success && response.data) {
           setSaldo(response.data.saldo.total);
         }

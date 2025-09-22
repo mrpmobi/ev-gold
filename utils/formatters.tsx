@@ -24,7 +24,10 @@ export const formatName = (value: string): string => {
 };
 
 export function formatMoney(value: string | number): string {
-  const number = typeof value === "string" ? parseFloat(value.replace(/[^\d,-]/g, "").replace(",", ".")) : value;
+  const number =
+    typeof value === "string"
+      ? parseFloat(value.replace(/[^\d,-]/g, "").replace(",", "."))
+      : value;
 
   if (isNaN(number)) return "R$ 0,00";
 
@@ -41,7 +44,7 @@ export function formatDate(dateString: string): string {
     return "";
   }
 
-  const partes = dateString.substring(0,10).split("-");
+  const partes = dateString.substring(0, 10).split("-");
   const ano = partes[0];
   const mes = partes[1];
   const dia = partes[2];
@@ -55,4 +58,30 @@ export function formatDateMobile(dateString: string): string {
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const year = date.getFullYear().toString().slice(-2);
   return `${day}/${month}/${year}`;
+}
+
+export function formatDateSlash(dateString: string): string {
+  if (!dateString) {
+    return "";
+  }
+
+  const partes = dateString.substring(0, 10).split("/");
+  const dia = partes[0];
+  const mes = partes[1];
+  const ano = partes[2];
+
+  return `${dia}/${mes}/${ano}`;
+}
+
+export function formatDateSlashMobile(dateString: string): string {
+  if (!dateString) {
+    return "";
+  }
+
+  const partes = dateString.substring(0, 10).split("/");
+  const dia = partes[0];
+  const mes = partes[1];
+  const ano = partes[2].slice(-2);
+
+  return `${dia}/${mes}/${ano}`;
 }

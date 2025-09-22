@@ -13,7 +13,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate, formatDateMobile, formatMoney } from "@/utils/formatters";
+import {
+  formatDate,
+  formatDateMobile,
+  formatDateSlash,
+  formatDateSlashMobile,
+  formatMoney,
+} from "@/utils/formatters";
 import React, { useEffect, useMemo, useState } from "react";
 import { DatePicker } from "./date-picker";
 import { StringToggleGroup } from "./string-togglegroup";
@@ -39,14 +45,13 @@ function toISODateString(date: Date | undefined): string | undefined {
 }
 
 interface Transaction {
-  date: string;
-  description: string;
-  value: string;
-  type: "entrada" | "saida";
+  data: string;
+  origem: string;
+  valor: string;
+  tipo: "entrada" | "saida";
 }
 
-interface ExtratoProps {
-}
+interface ExtratoProps {}
 
 export function Extrato() {
   const [typeFilter, setTypeFilter] = useState("todos");
@@ -63,7 +68,9 @@ export function Extrato() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchExtrato = async (token: string) => {
+    const token = authManager.getToken();
+    if (!token) return;
+    const fetchExtrato = async () => {
       try {
         const res = await apiService.getExtrato(token);
         if (res.success && res.data) {
@@ -72,9 +79,15 @@ export function Extrato() {
       } catch (error) {
         //console.error("Erro ao carregar dados do usuário:", error);
         throw error;
-      } 
+      }
+      finally {
+        setLoading(false);
+      }
     };
+    fetchExtrato();
+  }, []);
 
+  useEffect(() => {
     const fetchCPF = async () => {
       try {
         const token = authManager.getToken();
@@ -95,16 +108,8 @@ export function Extrato() {
         setCpf(cpf);
       } catch (err) {
         //console.error("Erro ao carregar CPF:", err);
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
-
-    const auth = authManager.getAuth();
-
-    if (auth && auth.token) {
-      fetchExtrato(auth.token);
-    }
 
     fetchCPF();
   }, []);
@@ -115,11 +120,11 @@ export function Extrato() {
 
     initialTableData.forEach((item) => {
       const valorNumerico = parseFloat(
-        item.value.replace("R$ ", "").replace(",", ".").replace("-", "")
+        item.valor.toString().replace("R$ ", "").replace(",", ".").replace("-", "")
       );
-      if (item.type === "entrada") {
+      if (item.tipo === "entrada") {
         entradas += valorNumerico;
-      } else if (item.type === "saida") {
+      } else if (item.tipo === "saida") {
         saidas += valorNumerico;
       }
     });
@@ -132,7 +137,7 @@ export function Extrato() {
 
   useEffect(() => {
     calculaEntradasESaidas();
-  }, []);
+  }, [initialTableData]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -143,21 +148,21 @@ export function Extrato() {
     const endDate = toISODateString(dataFinal);
 
     return initialTableData.filter((item) => {
-      if (typeFilter !== "todos" && item.type !== typeFilter) {
+      if (typeFilter !== "todos" && item.tipo !== typeFilter) {
         return false;
       }
 
-      if (startDate && item.date < startDate) {
+      if (startDate && item.data < startDate) {
         return false;
       }
 
-      if (endDate && item.date > endDate) {
+      if (endDate && item.data > endDate) {
         return false;
       }
 
       return true;
     });
-  }, [typeFilter, dataInicial, dataFinal]);
+  }, [initialTableData, typeFilter, dataInicial, dataFinal]);
 
   const totalPages = Math.ceil(filteredTableData.length / itemsPerPage);
 
@@ -353,7 +358,7 @@ export function Extrato() {
                   <TableBody>
                     {currentTableData.map((transaction, index) => {
                       const valueColor =
-                        transaction.type === "entrada"
+                        transaction.tipo === "entrada"
                           ? "text-supportgreen"
                           : "text-supportred";
                       return (
@@ -363,19 +368,19 @@ export function Extrato() {
                         >
                           <TableCell className="w-[30%] min-w-[40px] px-1 md:px-2 py-3 text-white text-xs md:text-sm">
                             <span className="md:hidden">
-                              {formatDateMobile(transaction.date)}
+                              {formatDateSlashMobile(transaction.data)}
                             </span>
                             <span className="hidden md:inline">
-                              {formatDate(transaction.date)}
+                              {formatDateSlash(transaction.data)}
                             </span>
                           </TableCell>
                           <TableCell className="w-[50%] min-w-[120px] px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
-                            {transaction.description}
+                            {transaction.origem}
                           </TableCell>
                           <TableCell
                             className={`w-[20%] min-w-[70px] px-1 md:px-2 py-3 text-xs md:text-sm text-right font-bold ${valueColor}`}
                           >
-                            {transaction.value}
+                            {formatMoney(transaction.valor)}
                           </TableCell>
                         </TableRow>
                       );
