@@ -14,8 +14,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  formatDate,
-  formatDateMobile,
   formatDateSlash,
   formatDateSlashMobile,
   formatMoney,
@@ -79,8 +77,7 @@ export function Extrato() {
       } catch (error) {
         //console.error("Erro ao carregar dados do usuário:", error);
         throw error;
-      }
-      finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -108,7 +105,7 @@ export function Extrato() {
         setCpf(cpf);
       } catch (err) {
         //console.error("Erro ao carregar CPF:", err);
-      } 
+      }
     };
 
     fetchCPF();
@@ -120,7 +117,11 @@ export function Extrato() {
 
     initialTableData.forEach((item) => {
       const valorNumerico = parseFloat(
-        item.valor.toString().replace("R$ ", "").replace(",", ".").replace("-", "")
+        item.valor
+          .toString()
+          .replace("R$ ", "")
+          .replace(",", ".")
+          .replace("-", "")
       );
       if (item.tipo === "entrada") {
         entradas += valorNumerico;
@@ -148,6 +149,13 @@ export function Extrato() {
     const endDate = toISODateString(dataFinal);
 
     return initialTableData.filter((item) => {
+      if (
+        searchTerm &&
+        !item.origem.toLowerCase().includes(searchTerm.toLowerCase())
+      ) {
+        return false;
+      }
+
       if (typeFilter !== "todos" && item.tipo !== typeFilter) {
         return false;
       }
@@ -162,7 +170,7 @@ export function Extrato() {
 
       return true;
     });
-  }, [initialTableData, typeFilter, dataInicial, dataFinal]);
+  }, [initialTableData, typeFilter, dataInicial, dataFinal, searchTerm]);
 
   const totalPages = Math.ceil(filteredTableData.length / itemsPerPage);
 
