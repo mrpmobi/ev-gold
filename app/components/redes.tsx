@@ -24,7 +24,6 @@ import { StringToggleGroup } from "./string-togglegroup";
 import { authManager } from "@/lib/auth";
 
 const levelOptions = [
-  { value: "todos", label: "Todos" },
   { value: "1", label: "1" },
   { value: "2", label: "2" },
   { value: "3", label: "3" },
@@ -48,7 +47,7 @@ interface RedesProps {
 
 export function Redes({ diretos, downlinesAllCount }: RedesProps) {
   const [downlines, setDownlines] = useState<Downline[]>([]);
-  const [levelFilter, setLevelFilter] = useState("todos");
+  const [levelFilter, setLevelFilter] = useState("1");
   const [timeFilter, setTimeFilter] = useState("sempre");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,15 +63,13 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
 
       const queryParams = new URLSearchParams();
 
-      if (levelFilter !== "todos") {
-        queryParams.append("nivel", levelFilter);
-      }
+      queryParams.append("nivel", levelFilter);
 
       if (searchTerm) {
         queryParams.append("nome", searchTerm);
       }
 
-      const res = await apiService.getUserDownlines(token);
+      const res = await apiService.getUserDownlines(token, queryParams);
 
       if (res.success && res.data) {
         setDownlines(res.data.downlines || []);

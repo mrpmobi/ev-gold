@@ -48,7 +48,7 @@ interface Downline {
   id: number;
   nome: string;
   nivel_relativo: number;
-  created_at: string
+  created_at: string;
 }
 
 class ApiService {
@@ -214,13 +214,17 @@ class ApiService {
   }
 
   async getUserDownlines(
-    token: string, queryParams?: URLSearchParams
+    token: string,
+    queryParams?: URLSearchParams
   ): Promise<ApiResponse<DownlinesResponse>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/user/downlines?${queryParams?.toString()}`, {
-        method: "GET",
-        headers: this.getHeaders(true, token),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/user/downlines?${queryParams?.toString()}`,
+        {
+          method: "GET",
+          headers: this.getHeaders(true, token),
+        }
+      );
 
       if (!response.ok) {
         const msg = `Erro HTTP: ${response.status}`;
@@ -233,11 +237,7 @@ class ApiService {
         throw new Error(data.message || `Erro HTTP: ${response.status}`);
       }
 
-      if (
-        data &&
-        data.contagem_por_nivel &&
-        data.downlines
-      ) {
+      if (data && data.contagem_por_nivel && data.downlines) {
         return {
           success: true,
           data: data,

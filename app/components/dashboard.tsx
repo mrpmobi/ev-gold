@@ -51,7 +51,10 @@ export default function DashboardComponent({
 
     const fetchDownlines = async () => {
       try {
-        const res = await apiService.getUserDownlines(token);
+        const queryParams = new URLSearchParams();
+        queryParams.append("nivel", "1");
+
+        const res = await apiService.getUserDownlines(token, queryParams);
         if (res.success && res.data) {
           setDownlines(res.data.downlines);
           setDownlinesCount(res.data.contagem_por_nivel);
