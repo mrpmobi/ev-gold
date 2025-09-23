@@ -85,3 +85,18 @@ export function formatDateSlashMobile(dateString: string): string {
 
   return `${dia}/${mes}/${ano}`;
 }
+
+export function parseMoney(value: string): number {
+  if (!value) return 0;
+
+  // Remove "R$ ", pontos, vírgulas e espaços
+  const cleanValue = value
+    .replace("R$", "")
+    .replace(/\./g, "")
+    .replace(",", ".")
+    .replace(/\s/g, "")
+    .trim();
+
+  const numero = parseFloat(cleanValue);
+  return isNaN(numero) ? 0 : numero;
+}

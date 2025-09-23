@@ -11,12 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { apiService } from "@/lib/api";
 import { authManager } from "@/lib/auth";
-import { formatMoney } from "@/utils/formatters";
+import { formatMoney, parseMoney } from "@/utils/formatters";
 import { maskCPF } from "@/utils/masks";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { AlertTriangle, CheckCircle, X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { LabelInput } from "./label-input";
 
 interface SaqueDialogProps {
   cpf: string;
@@ -27,13 +28,22 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
   const [result, setResult] = useState<"success" | "error" | null>(null);
   const [resultView, setResultView] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [valorSaque, setValorSaque] = useState(() => {
+    return Math.round(parseFloat(saldo) * 100).toString();
+  });
 
+  useEffect(() => {
+    setValorSaque(() => {
+      return Math.round(parseFloat(saldo) * 100).toString();
+    });
+  }, [saldo]);
+  
   const handleClick = async () => {
     setLoading(true);
     const token = authManager.getToken();
     if (!token) return;
     try {
-      const result = await apiService.saque(token, saldo);
+      const result = await apiService.saque(token, valorSaque);
 
       if (result.success && result.data) {
         toast.success("Saque realizado com sucesso!");
@@ -53,8 +63,28 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
 
   const handleClose = () => {
     setResult(null);
+    setValorSaque(() => {
+      return Math.round(parseFloat(saldo) * 100).toString();
+    });
     setResultView(false);
   };
+
+  const handleValorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove todos os caracteres não numéricos
+    const valorDigitado = e.target.value.replace(/\D/g, "");
+
+    // Limita o valor máximo ao saldo
+    const valorNumerico = Math.min(
+      parseInt(valorDigitado || "0", 10),
+      Math.round(parseFloat(saldo.toString()) * 100)
+    );
+
+    // Atualiza o estado com o valor em centavos
+    setValorSaque(valorNumerico.toString());
+  };
+
+  // Formata o valor para exibição
+  const valorExibicao = formatMoney(parseFloat(valorSaque) / 100);
 
   return (
     <Dialog>
@@ -120,19 +150,13 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
               </section>
 
               <section className="flex flex-col gap-1 w-full">
-                <div className="flex flex-col w-full">
-                  <div className="flex h-11 items-center gap-2 px-4 py-3 w-full bg-primarywhite rounded-sm border border-solid border-greyscale-30">
-                    <div className="flex flex-col justify-center flex-1 grow">
-                      <label className="font-p-4 font-[number:var(--p-4-font-weight)] text-greyscale-70 text-[length:var(--p-4-font-size)] tracking-[var(--p-4-letter-spacing)] leading-[var(--p-4-line-height)] overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical] [font-style:var(--p-4-font-style)]">
-                        Valor do saque
-                      </label>
-
-                      <div className="font-h4 font-[number:var(--h4-font-weight)] text-primaryblack text-[length:var(--h4-font-size)] tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical] [font-style:var(--h4-font-style)]">
-                        {formatMoney(saldo)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <LabelInput
+                  id="valorSaque"
+                  name="valorSaque"
+                  value={valorExibicao}
+                  onChange={handleValorChange}
+                  label="Valor do saque"
+                />
               </section>
             </DialogDescription>
             <footer className="flex flex-col gap-2 w-full">
