@@ -37,7 +37,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
       return Math.round(parseFloat(saldo) * 100).toString();
     });
   }, [saldo]);
-  
+
   const handleClick = async () => {
     setLoading(true);
     const token = authManager.getToken();
@@ -70,20 +70,16 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
   };
 
   const handleValorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Remove todos os caracteres não numéricos
     const valorDigitado = e.target.value.replace(/\D/g, "");
 
-    // Limita o valor máximo ao saldo
     const valorNumerico = Math.min(
       parseInt(valorDigitado || "0", 10),
       Math.round(parseFloat(saldo.toString()) * 100)
     );
 
-    // Atualiza o estado com o valor em centavos
     setValorSaque(valorNumerico.toString());
   };
 
-  // Formata o valor para exibição
   const valorExibicao = formatMoney(parseFloat(valorSaque) / 100);
 
   return (
@@ -109,7 +105,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
 
         {loading && (
           <div className="flex flex-col items-center justify-center flex-1 gap-4">
-            <div className="w-12 h-12 border-4 border-t-primarymobi border-gray-200 rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-4 border-t-primary border-gray-200 rounded-full animate-spin"></div>
             <div className="font-p-1 font-[number:var(--p-1-font-weight)] text-greyscale-30 text-[length:var(--p-1-font-size)] text-center tracking-[var(--p-1-letter-spacing)] leading-[var(--p-1-line-height)] [font-style:var(--p-1-font-style)]">
               Processando saque...
             </div>
@@ -120,7 +116,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
           <>
             <DialogDescription className="flex flex-col gap-4 w-full">
               <section className="flex flex-col gap-2 w-full">
-                <Card className="min-h-[70px] w-full rounded-lg overflow-hidden border border-solid border-primarymobi bg-transparent">
+                <Card className="min-h-[70px] w-full rounded-lg overflow-hidden border border-solid border-primary bg-transparent">
                   <CardContent className="flex items-center justify-center gap-4">
                     <div className="flex flex-col gap-4 flex-1">
                       <div className="flex flex-col gap-1 w-full">
@@ -162,8 +158,8 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
             <footer className="flex flex-col gap-2 w-full">
               <Button
                 onClick={handleClick}
-                disabled={loading}
-                className="h-11 w-full bg-primarymobi rounded-sm hover:bg-primarymobi/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || parseFloat(valorSaque) / 100 < 50}
+                className="h-11 w-full bg-primary rounded-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="font-h3 font-[number:var(--h3-font-weight)] text-primaryblack text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
                   {loading ? "Processando..." : "Sacar"}
