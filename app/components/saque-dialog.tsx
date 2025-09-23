@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { apiService } from "@/lib/api";
 import { authManager } from "@/lib/auth";
-import { formatMoney, parseMoney } from "@/utils/formatters";
+import { formatMoney } from "@/utils/formatters";
 import { maskCPF } from "@/utils/masks";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { AlertTriangle, CheckCircle, X } from "lucide-react";
@@ -61,7 +61,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
     }
   };
 
-  const handleClose = () => {
+  const handleReturn = () => {
     setResult(null);
     setValorSaque(() => {
       return Math.round(parseFloat(saldo) * 100).toString();
@@ -96,7 +96,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
             Saque de saldo
           </DialogTitle>
           <DialogClose
-            onClick={handleClose}
+            onClick={handleReturn}
             className="w-8 h-8 text-greyscale-30 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
           >
             <span className="sr-only">Fechar</span>
@@ -188,7 +188,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
             </div>
             <div className="flex-col items-start gap-2 flex relative self-stretch w-full flex-[0_0_auto]">
               <Button
-                onClick={handleClose}
+                onClick={handleReturn}
                 className="flex h-11 items-center justify-center gap-1 px-4 py-3 relative self-stretch w-full bg-greyscale-90 rounded-sm border border-solid border-greyscale-80 hover:bg-greyscale-80"
               >
                 <div className="relative w-fit font-h3 font-[number:var(--h3-font-weight)] text-primarywhite text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
@@ -227,14 +227,11 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
               </div>
             </div>
             <div className="flex-col items-start gap-2 flex relative self-stretch w-full flex-[0_0_auto]">
-              <Button
-                onClick={handleClose}
-                className="flex h-11 items-center justify-center gap-1 px-4 py-3 relative self-stretch w-full bg-greyscale-90 rounded-sm border border-solid border-greyscale-80 hover:bg-greyscale-80"
-              >
+              <DialogClose className="flex h-11 items-center justify-center gap-1 px-4 py-3 relative self-stretch w-full bg-greyscale-90 rounded-sm border border-solid border-greyscale-80 hover:bg-greyscale-80">
                 <div className="relative w-fit font-h3 font-[number:var(--h3-font-weight)] text-primarywhite text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
                   Fechar
                 </div>
-              </Button>
+              </DialogClose>
             </div>
           </>
         )}
