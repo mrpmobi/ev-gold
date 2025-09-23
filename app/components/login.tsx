@@ -110,7 +110,7 @@ export default function LoginComponent({
         height={44}
         className="absolute top-14 md:left-14 aspect-[2.82]"
         alt="Mrp mobi completo"
-        src="crown.svg"
+        src="gold-logo.svg"
       />
       <div className="w-full px-4 md:px-0 inline-flex flex-col items-center justify-center relative flex-[0_0_auto]">
         {cardView === "login" && (

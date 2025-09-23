@@ -36,7 +36,7 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
     >
       <SidebarHeader>
         <div className="px-6 py-8 justify-between w-full  flex items-center">
-          <img src="/crown.svg" alt="Logo" className="w-[99px] h-[35px]" />
+          <img src="/gold-logo.svg" alt="Logo" className="w-[99px] h-[35px]" />
           <Button
             onClick={() => setOpenMobile(false)}
             variant="ghost"

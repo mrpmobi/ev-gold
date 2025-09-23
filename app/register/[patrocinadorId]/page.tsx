@@ -188,7 +188,7 @@ export default function RegisterPage() {
       <img
         className="absolute w-[124px] h-11 top-14 left-14 aspect-[2.82]"
         alt="Gold MRP"
-        src="/crown.svg"
+        src="/gold-logo.svg"
       />
       <div className="inline-flex flex-col items-start gap-2 relative flex-[0_0_auto]">
         <Card className="w-[400px] min-h-[70px] bg-[#ffffff0d] rounded-2xl border border-solid border-greyscale-70 backdrop-blur-[5.85px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(5.85px)_brightness(100%)]">
