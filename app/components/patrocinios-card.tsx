@@ -129,10 +129,7 @@ export function PatrociniosCard({
                    tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] 
                    [font-style:var(--h4-font-style)]"
                   >
-                    {
-                      formatMoney("0")
-                      //formatMoney(downline.total_valor.toString())
-                    }
+                    {formatMoney(downline.ganhos.toString() ?? "0")}
                   </TableCell>
                 </TableRow>
               ))}

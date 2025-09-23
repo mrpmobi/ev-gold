@@ -49,6 +49,7 @@ interface Downline {
   nome: string;
   nivel_relativo: number;
   created_at: string;
+  ganhos: number;
 }
 
 class ApiService {
