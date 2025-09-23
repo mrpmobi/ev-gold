@@ -456,6 +456,33 @@ class ApiService {
       };
     }
   }
+
+  async saque(token: string, amount: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/withdrawals`, {
+        method: "POST",
+        headers: this.getHeaders(true, token),
+        body: JSON.stringify({amount: amount}),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Erro HTTP: ${response.status}`);
+      }
+
+      return {
+        success: true,
+        data: data,
+      };
+    } catch (error) {
+      //console.error("Erro no cadastro:", error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Erro no cadastro",
+      };
+    }
+  }
 }
 
 export const apiService = new ApiService();

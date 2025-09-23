@@ -9,11 +9,14 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
+import { apiService } from "@/lib/api";
+import { authManager } from "@/lib/auth";
 import { formatMoney } from "@/utils/formatters";
 import { maskCPF } from "@/utils/masks";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { AlertTriangle, CheckCircle, X } from "lucide-react";
 import React, { useState } from "react";
+import { toast } from "sonner";
 
 interface SaqueDialogProps {
   cpf: string;
@@ -23,11 +26,29 @@ interface SaqueDialogProps {
 export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
   const [result, setResult] = useState<"success" | "error" | null>(null);
   const [resultView, setResultView] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleClick = () => {
-    const isSuccess = Math.random() < 0.5; // Teste
-    setResult(isSuccess ? "success" : "error");
-    setResultView(true);
+  const handleClick = async () => {
+    setLoading(true);
+    const token = authManager.getToken();
+    if (!token) return;
+    try {
+      const result = await apiService.saque(token, saldo);
+
+      if (result.success && result.data) {
+        toast.success("Saque realizado com sucesso!");
+        setResult("success");
+      } else {
+        toast.error(result.message || "Erro ao sacar.");
+        setResult("error");
+      }
+    } catch (err) {
+      toast.error("Erro de rede. Tente novamente mais tarde.");
+      setResult("error");
+    } finally {
+      setLoading(false);
+      setResultView(true);
+    }
   };
 
   const handleClose = () => {
@@ -50,13 +71,22 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
           </DialogTitle>
           <DialogClose
             onClick={handleClose}
-            className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            className="w-8 h-8 text-greyscale-30 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
           >
-            <X className="w-8 h-8 text-greyscale-30" />
             <span className="sr-only">Fechar</span>
           </DialogClose>
         </DialogHeader>
-        {!resultView && (
+
+        {loading && (
+          <div className="flex flex-col items-center justify-center flex-1 gap-4">
+            <div className="w-12 h-12 border-4 border-t-primarymobi border-gray-200 rounded-full animate-spin"></div>
+            <div className="font-p-1 font-[number:var(--p-1-font-weight)] text-greyscale-30 text-[length:var(--p-1-font-size)] text-center tracking-[var(--p-1-letter-spacing)] leading-[var(--p-1-line-height)] [font-style:var(--p-1-font-style)]">
+              Processando saque...
+            </div>
+          </div>
+        )}
+
+        {!loading && !resultView && (
           <>
             <DialogDescription className="flex flex-col gap-4 w-full">
               <section className="flex flex-col gap-2 w-full">
@@ -108,17 +138,18 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
             <footer className="flex flex-col gap-2 w-full">
               <Button
                 onClick={handleClick}
-                className="h-11 w-full bg-primarymobi rounded-sm hover:bg-primarymobi/90"
+                disabled={loading}
+                className="h-11 w-full bg-primarymobi rounded-sm hover:bg-primarymobi/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="font-h3 font-[number:var(--h3-font-weight)] text-primaryblack text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
-                  Sacar
+                  {loading ? "Processando..." : "Sacar"}
                 </span>
               </Button>
             </footer>
           </>
         )}
 
-        {resultView && result === "error" && (
+        {!loading && resultView && result === "error" && (
           <>
             <div className="flex-col items-center justify-center gap-6 flex relative self-stretch w-full flex-[0_0_auto]">
               <div className="flex-col items-center gap-4 flex relative self-stretch w-full flex-[0_0_auto]">
@@ -148,7 +179,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
           </>
         )}
 
-        {resultView && result === "success" && (
+        {!loading && resultView && result === "success" && (
           <>
             <div className="flex-col items-center justify-center gap-6 flex relative self-stretch w-full flex-[0_0_auto]">
               <div className="flex-col items-center gap-4 flex relative self-stretch w-full flex-[0_0_auto]">
