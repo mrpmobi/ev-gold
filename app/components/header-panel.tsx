@@ -59,6 +59,8 @@ export function HeaderPanel({
 
     // Function to initialize Chatwoot
     const initializeChatwoot = () => {
+      const BASE_URL = "https://suporte.mrpmobi.com.br";
+
       // Check if already loaded
       if (window.$chatwoot) {
         setChatwootLoaded(true);
@@ -76,15 +78,15 @@ export function HeaderPanel({
 
       // Load Chatwoot script
       const script = document.createElement("script");
-      script.src = "https://suporte.mrpmobi.com.br/packs/js/sdk.js";
+      script.src = `${BASE_URL}/packs/js/sdk.js`;
       script.async = true;
       script.defer = true;
 
       script.onload = () => {
         if (window.chatwootSDK) {
           window.chatwootSDK.run({
-            websiteToken: "RH4JsqzjyL7xDoFTjSdYzeEg",
-            baseUrl: "https://suporte.mrpmobi.com.br",
+            websiteToken: "EkmjbBxMPE7WnP1VVB5iEU5D",
+            baseUrl: BASE_URL,
             targetId: "chatwoot-button-container",
             position: "custom",
           });
