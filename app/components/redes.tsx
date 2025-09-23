@@ -330,7 +330,9 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                               </TableCell>
 
                               <TableCell className="w-[20%] min-w-[70px] relative mt-[-0.50px] font-h2 font-[number:var(--h2-font-weight)] text-white text-[length:var(--h2-font-size)] text-right tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)] p-0">
-                                {row.ganhos}
+                                {formatMoney(
+                                  row.ganhos ? row.ganhos.toString() : "0"
+                                )}
                               </TableCell>
                             </TableRow>
                           ))
