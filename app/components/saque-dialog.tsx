@@ -31,6 +31,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
   const [valorSaque, setValorSaque] = useState(() => {
     return Math.round(parseFloat(saldo) * 100).toString();
   });
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setValorSaque(() => {
@@ -51,6 +52,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
       } else {
         toast.error(result.message || "Erro ao sacar.");
         setResult("error");
+        setError(result.message || "Erro ao sacar.");
       }
     } catch (err) {
       toast.error("Erro de rede. Tente novamente mais tarde.");
@@ -177,6 +179,10 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
                 <div className="flex-col items-start gap-2 flex relative self-stretch w-full flex-[0_0_auto]">
                   <div className="relative self-stretch mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-supportred text-[length:var(--h2-font-size)] text-center tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
                     Erro ao solicitar o saque
+                  </div>
+
+                  <div className="font-bold relative self-stretch font-p-1 text-greyscale-30 text-[length:var(--p-1-font-size)] text-center tracking-[var(--p-1-letter-spacing)] leading-[var(--p-1-line-height)] [font-style:var(--p-1-font-style)]">
+                    {error}
                   </div>
 
                   <div className="relative self-stretch font-p-1 font-[number:var(--p-1-font-weight)] text-greyscale-30 text-[length:var(--p-1-font-size)] text-center tracking-[var(--p-1-letter-spacing)] leading-[var(--p-1-line-height)] [font-style:var(--p-1-font-style)]">

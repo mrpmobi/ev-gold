@@ -500,7 +500,7 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || `Erro HTTP: ${response.status}`);
+        throw new Error(data.error || `Erro HTTP: ${response.status}`);
       }
 
       return {
