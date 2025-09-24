@@ -9,13 +9,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell } from "lucide-react";
 import { authManager } from "@/lib/auth";
-import { API_BASE_URL } from "@/lib/api";
+import { API_BASE_URL, apiService } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDateSlash } from "@/utils/formatters";
 
 interface WalletRecord {
   id: number;
-  value: string;
-  created_at: string;
+  valor: string;
+  data: string;
 }
 
 export function UltimosGanhos() {
@@ -23,20 +24,17 @@ export function UltimosGanhos() {
   const [notifications, setNotifications] = useState<WalletRecord[]>([]);
 
   async function fetchUltimosGanhos() {
+    const token = authManager.getToken();
+    if (!token) return;
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/twenty-one-wallet`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authManager?.getToken()}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error("Erro ao buscar saldo");
-      setNotifications(data.data.wallets || []);
+      const res = await apiService.getGanhos(token);
+      if (res.success && res.data) {
+        setNotifications(res.data.extrato.slice(0, 6));
+      }
     } catch (error) {
-      //console.error("Erro ao carregar saldo:", error);
+      //console.error("Erro ao carregar dados do usuário:", error);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -60,7 +58,9 @@ export function UltimosGanhos() {
       >
         <Card className="bg-[#121212] border border-gray-800">
           <CardHeader>
-            <CardTitle className="flex justify-center text-white">Últimos Ganhos</CardTitle>
+            <CardTitle className="flex justify-center text-white">
+              Últimos Ganhos
+            </CardTitle>
           </CardHeader>
           <CardContent className="max-h-64 overflow-y-auto p-0">
             {loading ? (
@@ -74,9 +74,9 @@ export function UltimosGanhos() {
                   className="p-3 hover:bg-gray-900 cursor-pointer border-b border-gray-800 transition-colors"
                 >
                   <div className="flex justify-between items-center">
-                    <span className="text-white font-medium">+{n.value}</span>
+                    <span className="text-white font-medium">+{n.valor}</span>
                     <span className="text-gray-400 text-sm">
-                      {new Date(n.created_at).toLocaleDateString()}
+                      {formatDateSlash(n.data)}
                     </span>
                   </div>
                 </div>

@@ -70,7 +70,7 @@ export function Extrato() {
     if (!token) return;
     const fetchExtrato = async () => {
       try {
-        const res = await apiService.getExtrato(token);
+        const res = await apiService.getGanhos(token);
         if (res.success && res.data) {
           setInitialTableData(res.data.extrato);
         }

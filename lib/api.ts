@@ -421,7 +421,7 @@ class ApiService {
     }
   }
 
-  async getExtrato(token: string): Promise<ApiResponse<ExtratoResponse>> {
+  async getGanhos(token: string): Promise<ApiResponse<ExtratoResponse>> {
     try {
       const response = await fetch(`${API_BASE_URL}/saldo/extrato`, {
         method: "GET",
