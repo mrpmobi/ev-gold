@@ -101,7 +101,7 @@ export default function DashboardComponent({
       try {
         const response = await apiService.getSaldo(token);
         if (response.success && response.data) {
-          setSaldo(response.data.saldo.total);
+          setSaldo(response.data.balance);
         }
       } catch (error) {}
     };
@@ -162,7 +162,7 @@ export default function DashboardComponent({
           )}
           {currentPage === "extrato" && (
             <>
-              <Extrato />
+              <Extrato saldo={saldo} />
             </>
           )}
           {currentPage === "perfil" && userData && (

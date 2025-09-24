@@ -49,9 +49,11 @@ interface Transaction {
   tipo: "entrada" | "saida";
 }
 
-interface ExtratoProps {}
+interface ExtratoProps {
+  saldo: string;
+}
 
-export function Extrato() {
+export function Extrato({ saldo }: ExtratoProps) {
   const [typeFilter, setTypeFilter] = useState("todos");
   const [dataInicial, setDataInicial] = useState<Date | undefined>(undefined);
   const [dataFinal, setDataFinal] = useState<Date | undefined>(undefined);
@@ -61,7 +63,7 @@ export function Extrato() {
   const [cpf, setCpf] = useState("");
   const [totalEntradas, setTotalEntradas] = useState("0,00");
   const [totalSaidas, setTotalSaidas] = useState("0,00");
-  const [saldoAtual, setSaldoAtual] = useState("0,00");
+  const [saldoAtual, setSaldoAtual] = useState(saldo);
   const [initialTableData, setInitialTableData] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -132,8 +134,6 @@ export function Extrato() {
 
     setTotalEntradas(formatMoney(entradas));
     setTotalSaidas(formatMoney(saidas));
-    const saldo = entradas - saidas;
-    setSaldoAtual(saldo.toString());
   }
 
   useEffect(() => {

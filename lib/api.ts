@@ -423,21 +423,21 @@ class ApiService {
 
   async getSaldo(token: string): Promise<ApiResponse<any>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/saldo/get`, {
+      const response = await fetch(`${API_BASE_URL}/user/wallet/saldo`, {
         method: "GET",
         headers: this.getHeaders(true, token),
       });
 
-      const res = await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(res.message || `Erro HTTP: ${response.status}`);
+        throw new Error(data.message || `Erro HTTP: ${response.status}`);
       }
 
-      if (res && res.success && res.data && res.data.saldo) {
+      if (data && data.balance) {
         return {
           success: true,
-          data: res.data,
+          data: data,
         };
       } else {
         throw new Error("Formato de resposta inesperado para Extrato");
