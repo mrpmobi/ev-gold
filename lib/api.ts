@@ -359,6 +359,37 @@ class ApiService {
     }
   }
 
+  async getTotalPatrocinios(token: string): Promise<ApiResponse<string>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/matriz/contagem`, {
+        method: "GET",
+        headers: this.getHeaders(true, token),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Erro HTTP: ${response.status}`);
+      }
+
+      if (data && data.data && data.data.total_patrocinio) {
+        return {
+          success: true,
+          data: data.data.total_patrocinio,
+        };
+      } else {
+        throw new Error("Formato de resposta inesperado para total de patrocinios");
+      }
+    } catch (error) {
+      //console.error("API: Erro ao buscar usuário por email:", error);
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Falha ao obter total de patrocinios",
+      };
+    }
+  }
+
   async logout(token: string): Promise<ApiResponse<boolean>> {
     try {
       const response = await fetch(`${API_BASE_URL}/user/logout`, {
@@ -463,7 +494,7 @@ class ApiService {
       const response = await fetch(`${API_BASE_URL}/user/withdrawals`, {
         method: "POST",
         headers: this.getHeaders(true, token),
-        body: JSON.stringify({amount: amount}),
+        body: JSON.stringify({ amount: amount }),
       });
 
       const data = await response.json();

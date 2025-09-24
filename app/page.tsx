@@ -51,6 +51,7 @@ export default function HomePage() {
           const refresh = await refreshToken(auth.token);
 
           if (refresh) {
+            authManager.saveAuth(auth.user, refresh);
             setUserEmail(auth.user.email);
             setCurrentUser(auth.user);
             setCurrentView("dashboard");

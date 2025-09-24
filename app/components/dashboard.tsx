@@ -32,8 +32,30 @@ export default function DashboardComponent({
   const [currentPage, setCurrentPage] = useState("home");
   const [saldo, setSaldo] = useState("0.00");
   const [downlines, setDownlines] = useState<Downline[]>([]);
-  const [downlinesCount, setDownlinesCount] = useState<ContagemPorNivel>({});
   const [downlinesAllCount, setDownlinesAllCount] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchTotalPatrocinios = async () => {
+      try {
+        const auth = authManager.getAuth();
+
+        if (auth?.token) {
+          const res = await apiService.getTotalPatrocinios(auth.token);
+
+          if (res && res.data) {
+            setDownlinesAllCount(parseInt(res.data));
+          } else {
+            throw new Error("Falha ao obter total de patrocinios");
+          }
+        } else {
+        }
+      } catch (error) {
+        console.error("Erro na verificação de autenticação:", error);
+      }
+    };
+
+    fetchTotalPatrocinios();
+  }, []);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -57,12 +79,10 @@ export default function DashboardComponent({
         const res = await apiService.getUserDownlines(token, queryParams);
         if (res.success && res.data) {
           setDownlines(res.data.downlines);
-          setDownlinesCount(res.data.contagem_por_nivel);
           const somaTotal = Object.values(res.data.contagem_por_nivel).reduce(
             (total, valor) => total + valor,
             0
           );
-          setDownlinesAllCount(somaTotal);
         }
       } catch (error) {
         //console.error("Erro ao carregar dados do usuário:", error);
