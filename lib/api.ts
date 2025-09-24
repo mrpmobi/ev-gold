@@ -341,10 +341,10 @@ class ApiService {
         throw new Error(data.message || `Erro HTTP: ${response.status}`);
       }
 
-      if (data && data.token) {
+      if (data && data.access_token) {
         return {
           success: true,
-          data: data.token,
+          data: data.access_token,
         };
       } else {
         throw new Error("Formato de resposta inesperado para refresh");

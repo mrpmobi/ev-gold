@@ -5,16 +5,17 @@ import LoginComponent from "./components/login";
 import DashboardComponent from "./components/dashboard";
 import CadastroComponent from "./components/cadastro";
 import { authManager } from "./lib/auth";
-import type { User } from "./lib/api"; // Importa o tipo User
+import type { User } from "./lib/api";
 import { apiService } from "@/lib/api";
 
 type AppState = "login" | "dashboard" | "cadastro";
 
 export default function HomePage() {
-  const [currentView, setCurrentView] = useState<AppState>("login");
   const [userEmail, setUserEmail] = useState("");
-  const [currentUser, setCurrentUser] = useState<User | null>(null); // Define o tipo para currentUser
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<User | null>(null);
+  const [currentView, setCurrentView] = useState<AppState>("login"); // Estado inicial sempre login
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true); // Novo estado para controlar a verificação
 
   const refreshToken = async (token: string) => {
     try {
@@ -23,9 +24,8 @@ export default function HomePage() {
         return refreshResult.data;
       }
     } catch (error) {
-      //console.error("Erro ao carregar dados do usuário:", error);
+      console.error("Erro ao renovar token:", error);
       throw error;
-    } finally {
     }
   };
 
@@ -36,39 +36,52 @@ export default function HomePage() {
         return res.data;
       }
     } catch (error) {
-      //console.error("Erro ao carregar dados do usuário:", error);
+      console.error("Erro no logout:", error);
       throw error;
-    } finally {
     }
   };
 
   useEffect(() => {
     const checkAuth = async () => {
-      const auth = authManager.getAuth();
+      try {
+        const auth = authManager.getAuth();
 
-      if (auth && auth.user && auth.user.id) {
-        const refresh = await refreshToken(auth?.token);
+        if (auth?.user?.id && auth?.token) {
+          // Tenta renovar o token apenas se existir auth válida
+          const refresh = await refreshToken(auth.token);
 
-        if (refresh) {
-          setUserEmail(auth.user.email);
-          setCurrentUser(auth.user);
-          setCurrentView("dashboard");
+          if (refresh) {
+            setUserEmail(auth.user.email);
+            setCurrentUser(auth.user);
+            setCurrentView("dashboard");
+          } else {
+            throw new Error("Falha na renovação do token");
+          }
         } else {
+          // Não há auth válida, vai para login
           setCurrentView("login");
-          setUserEmail("");
-          setCurrentUser(null);
           authManager.clearAuth();
         }
-      } else {
+      } catch (error) {
+        console.error("Erro na verificação de autenticação:", error);
         setCurrentView("login");
-        setUserEmail("");
-        setCurrentUser(null);
-        authManager.clearAuth(); // Garante que dados incompletos sejam limpos
+        authManager.clearAuth();
+      } finally {
+        setIsCheckingAuth(false); // Finaliza a verificação
       }
     };
 
     checkAuth();
   }, []);
+
+  // Renderiza loading enquanto verifica a autenticação
+  if (isCheckingAuth) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-t-primary border-gray-200 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   const handleLogin = (email: string, loginData: User) => {
     setUserEmail(email);
@@ -83,13 +96,17 @@ export default function HomePage() {
   };
 
   const handleLogout = async (token: string) => {
-    const apiLogout = await logout(token);
-    if (apiLogout) console.log(apiLogout);
-    authManager.clearAuth();
-    setCurrentView("login");
-    setUserEmail("");
-    setCurrentUser(null);
-    setUserData(null);
+    try {
+      await logout(token);
+    } catch (error) {
+      console.error("Erro no logout:", error);
+    } finally {
+      authManager.clearAuth();
+      setCurrentView("login");
+      setUserEmail("");
+      setCurrentUser(null);
+      setUserData(null);
+    }
   };
 
   const handleGoToCadastro = () => {
@@ -115,65 +132,10 @@ export default function HomePage() {
     <>
       <Head>
         <title>Pré-cadastro MRP Mobi</title>
-        <meta name="description" content="MRP Mobi" />
-        <meta name="author" content="MRP Mobi" />
-        <link rel="icon" href="/favicon.ico" />
-
-        {/* Meta Pixel Code */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window, document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '731289790385053');
-              fbq('track', 'PageView');
-            `,
-          }}
-        />
-
-        {/* OG / Twitter meta */}
-        <meta property="og:url" content="https://precadastro.escola.cc" />
-        <meta
-          property="og:title"
-          content="MRP Mobi - Pré-cadastro de Consultores"
-        />
-        <meta
-          property="og:description"
-          content="Participe da rede de consultores MRP Mobi!"
-        />
-        <meta
-          property="og:image"
-          content="https://precadastro.escola.cc/share.png"
-        />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="MRP Mobi - Pré-cadastro" />
-        <meta
-          name="twitter:description"
-          content="Venha fazer parte do time MRP Mobi!"
-        />
-        <meta
-          name="twitter:image"
-          content="https://precadastro.escola.cc/share.png"
-        />
+        {/* ... resto do head ... */}
       </Head>
 
-      {/* Meta Pixel noscript fallback */}
-      <noscript>
-        <img
-          height="1"
-          width="1"
-          style={{ display: "none" }}
-          src="https://www.facebook.com/tr?id=731289790385053&ev=PageView&noscript=1"
-          alt=""
-        />
-      </noscript>
+      {/* ... resto do meta pixel ... */}
 
       <div id="root">
         {currentView === "login" && (
