@@ -76,3 +76,18 @@ export function formatDateMobile(dateString: string): string {
 
   return `${dia}/${mes}/${ano}`;
 }
+
+export function parseCustomDateFormat(dateString: string): string {
+  // Split the date and time parts
+  const [datePart, timePart] = dateString.split(' ');
+  
+  // Split date into day, month, year
+  const [day, month, year] = datePart.split('/').map(Number);
+  
+  // Split time into hours and minutes
+  const [hours, minutes] = timePart.split(':').map(Number);
+
+  // Create a new Date object
+  // Note: month is 0-indexed in Date constructor, so subtract 1
+  return new Date(year, month - 1, day, hours, minutes).toISOString();
+}

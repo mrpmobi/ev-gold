@@ -13,7 +13,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate, formatDateMobile, formatMoney } from "@/utils/formatters";
+import {
+  formatDate,
+  formatDateMobile,
+  formatMoney,
+  parseCustomDateFormat,
+} from "@/utils/formatters";
 import React, { useEffect, useMemo, useState } from "react";
 import { DatePicker } from "./date-picker";
 import { StringToggleGroup } from "./string-togglegroup";
@@ -58,8 +63,8 @@ export function Extrato({ saldo }: ExtratoProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 9;
   const [cpf, setCpf] = useState("");
-  const [totalEntradas, setTotalEntradas] = useState("0,00");
-  const [totalSaidas, setTotalSaidas] = useState("0,00");
+  const [totalEntradas, setTotalEntradas] = useState(0);
+  const [totalSaidas, setTotalSaidas] = useState(0);
   const [saldoAtual, setSaldoAtual] = useState(saldo);
   const [initialTableData, setInitialTableData] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,20 +72,71 @@ export function Extrato({ saldo }: ExtratoProps) {
   useEffect(() => {
     const token = authManager.getToken();
     if (!token) return;
-    const fetchExtrato = async () => {
+
+    const fetchData = async () => {
       try {
-        const res = await apiService.getGanhos(token);
-        if (res.success && res.data) {
-          setInitialTableData(res.data.extrato);
+        setLoading(true);
+        const [ganhosRes, saquesRes] = await Promise.all([
+          apiService.getGanhos(token),
+          apiService.getExtrato(token),
+        ]);
+
+        let mergedTableData: Transaction[] = [];
+
+        // Map and merge ganhos data
+        if (ganhosRes.success && ganhosRes.data && ganhosRes.data.extrato) {
+          const mappedGanhos = ganhosRes.data.extrato.map(
+            (item: {
+              data: any;
+              origem: any;
+              status: any;
+              valor: any;
+              tipo: any;
+            }) => ({
+              data: parseCustomDateFormat(item.data),
+              origem: item.origem,
+              status: item.status || "",
+              valor: item.valor,
+              tipo: item.tipo,
+            })
+          );
+          mergedTableData = [...mergedTableData, ...mappedGanhos];
         }
+
+        // Map and merge saques data
+        if (saquesRes.success && saquesRes.data) {
+          const mappedSaques = saquesRes.data.map(
+            (item: {
+              created_at: any;
+              description: any;
+              refunded: any;
+              amount: any;
+            }) => ({
+              data: item.created_at,
+              origem: item.description,
+              status: item.refunded ? "aprovado" : "pendente",
+              valor: item.amount,
+              tipo: "saida",
+            })
+          );
+          mergedTableData = [...mergedTableData, ...mappedSaques];
+        }
+
+        // Sort merged data by date (most recent first)
+        mergedTableData.sort(
+          (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
+        );
+
+        setInitialTableData(mergedTableData);
       } catch (error) {
-        //console.error("Erro ao carregar dados do usuário:", error);
-        throw error;
+        // Handle error appropriately
+        console.error("Erro ao carregar dados do usuário:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchExtrato();
+
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -115,15 +171,15 @@ export function Extrato({ saldo }: ExtratoProps) {
           .replace(",", ".")
           .replace("-", "")
       );
-      if (item.tipo === "entrada") {
+      if (item.tipo === "entrada" && item.status === "aprovado") {
         entradas += valorNumerico;
-      } else if (item.tipo === "saida") {
+      } else if (item.tipo === "saida" && item.status === "aprovado") {
         saidas += valorNumerico;
       }
     });
 
-    setTotalEntradas(formatMoney(entradas));
-    setTotalSaidas(formatMoney(saidas));
+    setTotalEntradas(entradas);
+    setTotalSaidas(saidas);
   }
 
   useEffect(() => {
@@ -252,7 +308,7 @@ export function Extrato({ saldo }: ExtratoProps) {
                 </div>
                 <div className="text-supportgreen font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
                   <div className="flex justify-start items-center space-x-1">
-                    <span>{totalEntradas}</span>
+                    <span>{formatMoney(totalEntradas)}</span>
                   </div>
                 </div>
               </CardContent>
@@ -262,7 +318,7 @@ export function Extrato({ saldo }: ExtratoProps) {
                 </div>
                 <div className="text-supportred font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
                   <div className="flex justify-start items-center space-x-1">
-                    <span>{totalSaidas}</span>
+                    <span>{formatMoney(totalSaidas)}</span>
                   </div>
                 </div>
               </CardContent>
@@ -272,7 +328,7 @@ export function Extrato({ saldo }: ExtratoProps) {
                 </div>
                 <div className="text-white font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
                   <div className="flex justify-start items-center space-x-1">
-                    <span>{formatMoney(saldoAtual)}</span>
+                    <span>{formatMoney(totalEntradas - totalSaidas)}</span>
                   </div>
                 </div>
               </CardContent>
