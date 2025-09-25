@@ -109,21 +109,18 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
 
     if (allRequirementsMet && passwordsMatch) {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/password/otp/change-password`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: email,
-              otp: otp,
-              new_password: formData.novaSenha,
-              new_password_confirmation: formData.confirmarSenha,
-            }),
-          }
-        );
+        const response = await fetch(`${API_BASE_URL}/otp/change-password`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            otp: otp,
+            new_password: formData.novaSenha,
+            new_password_confirmation: formData.confirmarSenha,
+          }),
+        });
 
         const data = await response.json();
         if (response.ok) {
@@ -351,6 +348,9 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
                 <div className="relative w-fit font-h2 font-[number:var(--h2-font-weight)] text-white text-[length:var(--h2-font-size)] text-center tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)]">
                   {email}
                 </div>
+                <div className="relative self-stretch mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-greyscale-40 text-[length:var(--h3-font-size)] text-center tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
+                  (Cheque sua caixa de spam/lixo eletrônico)
+                </div>
               </div>
 
               <div className="flex-col items-start gap-4 flex relative self-stretch w-full flex-[0_0_auto]">
@@ -364,7 +364,6 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
                     onChange={handleOTP}
                     autoFocus
                   >
-                    "
                     <InputOTPGroup className="gap-2">
                       <InputOTPSlot
                         index={0}
