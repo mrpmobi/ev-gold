@@ -44,6 +44,23 @@ interface DownlinesResponse {
   downlines: Downline[];
 }
 
+interface UserDataResponse {
+  message: ContagemPorNivel;
+  data: UserData;
+}
+
+interface UserData {
+  id: number;
+  name: string;
+  email: string;
+  cpf: string;
+  email_verified_at: string;
+  data_ativavao: string;
+  created_at: string;
+  updated_at: string;
+  patrocinador_id: string;
+}
+
 interface Downline {
   id: number;
   nome: string;
@@ -122,98 +139,6 @@ class ApiService {
     }
   }
 
-  async getUserById(id: number, token: string): Promise<ApiResponse<User>> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/user/${id}`, {
-        method: "GET",
-        headers: this.getHeaders(true, token),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || `Erro HTTP: ${response.status}`);
-      }
-
-      // A API pode retornar { user: {...} } ou o objeto user direto
-      // Mapeia 'nome' para 'name' se presente
-      const userData = data.user || data;
-      if (userData && userData.nome && !userData.name) {
-        userData.name = userData.nome;
-      }
-
-      return {
-        success: true,
-        data: userData,
-      };
-    } catch (error) {
-      //console.error(`API: Erro ao buscar usuário ${id}:`, error);
-      return {
-        success: false,
-        message:
-          error instanceof Error ? error.message : "Erro ao buscar usuário",
-      };
-    }
-  }
-
-  async getUserPai(userId: number, token: string): Promise<ApiResponse<User>> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/user/${userId}/pai`, {
-        method: "GET",
-        headers: this.getHeaders(true, token),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || `Erro HTTP: ${response.status}`);
-      }
-
-      let paiData: any = null;
-      // Verifica se a resposta contém a chave 'upline' e se é um array não vazio
-      if (data.upline && Array.isArray(data.upline) && data.upline.length > 0) {
-        paiData = data.upline[0]; // Pega o primeiro elemento do array upline
-      } else if (data.pai) {
-        paiData = data.pai;
-      } else if (data.user) {
-        paiData = data.user;
-      } else if (data.usuario) {
-        paiData = data.usuario;
-      } else {
-        paiData = data; // Fallback para o próprio objeto data
-      }
-
-      // Mapeia 'nome' para 'name' se presente
-      if (paiData && paiData.nome && !paiData.name) {
-        paiData.name = paiData.nome;
-      }
-
-      if (paiData && paiData.id) {
-        return {
-          success: true,
-          data: paiData,
-        };
-      } else {
-        //console.error(
-        //  `API: Patrocinador para ${userId} não possui ID ou é nulo/indefinido após extração. Objeto:`,
-        //  paiData
-        //);
-        throw new Error(
-          "Formato de resposta inesperado para getUserPai ou dados incompletos."
-        );
-      }
-    } catch (error) {
-      //console.error(`API: Erro ao buscar patrocinador para ${userId}:`, error);
-      return {
-        success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Erro ao buscar patrocinador",
-      };
-    }
-  }
-
   async getUserDownlines(
     token: string,
     queryParams?: URLSearchParams
@@ -233,10 +158,6 @@ class ApiService {
       }
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || `Erro HTTP: ${response.status}`);
-      }
 
       if (data && data.contagem_por_nivel && data.downlines) {
         return {
@@ -259,71 +180,37 @@ class ApiService {
     }
   }
 
-  async getAllUsers(token: string): Promise<ApiResponse<User[]>> {
+  async getUserData(token: string): Promise<ApiResponse<UserDataResponse>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/user/all`, {
+      const response = await fetch(`${API_BASE_URL}/user/me`, {
         method: "GET",
         headers: this.getHeaders(true, token),
       });
 
       const data = await response.json();
-
+      
       if (!response.ok) {
-        throw new Error(data.message || `Erro HTTP: ${response.status}`);
+        const msg = `Erro HTTP: ${response.status}`;
+        throw new Error(msg);
       }
 
-      return {
-        success: true,
-        data: data.users || data,
-      };
-    } catch (error) {
-      //console.error("Erro ao buscar usuários:", error);
-      return {
-        success: false,
-        message:
-          error instanceof Error ? error.message : "Erro ao buscar usuários",
-      };
-    }
-  }
-
-  async findUserByEmail(
-    email: string,
-    token: string
-  ): Promise<ApiResponse<User>> {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/user/findByEmail/${encodeURIComponent(email)}`,
-        {
-          method: "GET",
-          headers: this.getHeaders(true, token),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || `Erro HTTP: ${response.status}`);
-      }
-
-      // Acessar data.usuario conforme o retorno da API
-      if (data && data.usuario) {
-        // Mapeia 'nome' para 'name' se presente
-        if (data.usuario.nome && !data.usuario.name) {
-          data.usuario.name = data.usuario.nome;
-        }
+      if (data && data.message && data.data) {
         return {
           success: true,
-          data: data.usuario,
+          data: data,
         };
       } else {
-        throw new Error("Formato de resposta inesperado para findUserByEmail");
+        throw new Error("Estrutura de dados inválida na resposta da API");
       }
     } catch (error) {
-      //console.error("API: Erro ao buscar usuário por email:", error);
+      //console.error(`API: Erro ao buscar rede para ${userId}:`, error);
       return {
         success: false,
         message:
-          error instanceof Error ? error.message : "Usuário não encontrado",
+          error instanceof Error
+            ? error.message
+            : "Erro desconhecido ao buscar rede",
+        data: undefined,
       };
     }
   }

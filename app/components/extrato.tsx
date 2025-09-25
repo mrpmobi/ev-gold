@@ -84,26 +84,19 @@ export function Extrato({ saldo }: ExtratoProps) {
   }, []);
 
   useEffect(() => {
+    const token = authManager.getToken();
+    if (!token) return;
     const fetchCPF = async () => {
       try {
-        const token = authManager.getToken();
-        const response = await fetch(`${API_BASE_URL}/office/user/profile`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const data = await response.json();
-        if (!response.ok)
-          throw new Error(data.message || "Erro ao carregar perfil");
-
-        // Extrai o CPF diretamente
-        const cpf = data.personal?.tax_id || data.personal?.document || "";
-        setCpf(cpf);
-      } catch (err) {
-        //console.error("Erro ao carregar CPF:", err);
+        const res = await apiService.getUserData(token);
+        if (res.success && res.data && res.data.data && res.data.data.cpf) {
+          setCpf(res.data.data.cpf);
+        }
+      } catch (error) {
+        //console.error("Erro ao carregar dados do usuário:", error);
+        throw error;
+      } finally {
+        setLoading(false);
       }
     };
 
