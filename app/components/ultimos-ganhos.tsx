@@ -11,7 +11,7 @@ import { Bell } from "lucide-react";
 import { authManager } from "@/lib/auth";
 import { API_BASE_URL, apiService } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDateSlash } from "@/utils/formatters";
+import { formatDate } from "@/utils/formatters";
 
 interface WalletRecord {
   id: number;
@@ -76,7 +76,7 @@ export function UltimosGanhos() {
                   <div className="flex justify-between items-center">
                     <span className="text-white font-medium">+{n.valor}</span>
                     <span className="text-gray-400 text-sm">
-                      {formatDateSlash(n.data)}
+                      {formatDate(n.data)}
                     </span>
                   </div>
                 </div>

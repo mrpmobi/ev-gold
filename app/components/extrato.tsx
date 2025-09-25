@@ -39,11 +39,11 @@ function toISODateString(date: Date | undefined): string | undefined {
 }
 
 interface Transaction {
-  created_at: string;
-  description: string;
-  refunded: boolean;
-  amount: string;
-  type: "entrada" | "saida";
+  data: string;
+  origem: string;
+  status: string;
+  valor: string;
+  tipo: "entrada" | "saida";
 }
 
 interface ExtratoProps {
@@ -69,9 +69,9 @@ export function Extrato({ saldo }: ExtratoProps) {
     if (!token) return;
     const fetchExtrato = async () => {
       try {
-        const res = await apiService.getExtrato(token);
+        const res = await apiService.getGanhos(token);
         if (res.success && res.data) {
-          setInitialTableData(res.data);
+          setInitialTableData(res.data.extrato);
         }
       } catch (error) {
         //console.error("Erro ao carregar dados do usuário:", error);
@@ -116,15 +116,15 @@ export function Extrato({ saldo }: ExtratoProps) {
 
     initialTableData.forEach((item) => {
       const valorNumerico = parseFloat(
-        item.amount
+        item.valor
           .toString()
           .replace("R$ ", "")
           .replace(",", ".")
           .replace("-", "")
       );
-      if (item.type === "entrada") {
+      if (item.tipo === "entrada") {
         entradas += valorNumerico;
-      } else if (item.type === "saida") {
+      } else if (item.tipo === "saida") {
         saidas += valorNumerico;
       }
     });
@@ -148,20 +148,20 @@ export function Extrato({ saldo }: ExtratoProps) {
     return initialTableData.filter((item) => {
       if (
         searchTerm &&
-        !item.description.toLowerCase().includes(searchTerm.toLowerCase())
+        !item.origem.toLowerCase().includes(searchTerm.toLowerCase())
       ) {
         return false;
       }
 
-      if (typeFilter !== "todos" && item.type !== typeFilter) {
+      if (typeFilter !== "todos" && item.tipo !== typeFilter) {
         return false;
       }
 
-      if (startDate && item.created_at < startDate) {
+      if (startDate && item.data < startDate) {
         return false;
       }
 
-      if (endDate && item.created_at > endDate) {
+      if (endDate && item.data > endDate) {
         return false;
       }
 
@@ -366,7 +366,7 @@ export function Extrato({ saldo }: ExtratoProps) {
                   <TableBody>
                     {currentTableData.map((transaction, index) => {
                       const valueColor =
-                        transaction.type === "entrada"
+                        transaction.tipo === "entrada"
                           ? "text-supportgreen"
                           : "text-supportred";
                       return (
@@ -376,22 +376,24 @@ export function Extrato({ saldo }: ExtratoProps) {
                         >
                           <TableCell className="w-[20%] min-w-[40px] px-1 md:px-2 py-3 text-white text-xs md:text-sm">
                             <span className="md:hidden">
-                              {formatDateMobile(transaction.created_at)}
+                              {formatDateMobile(transaction.data)}
                             </span>
                             <span className="hidden md:inline">
-                              {formatDate(transaction.created_at)}
+                              {formatDate(transaction.data)}
                             </span>
                           </TableCell>
                           <TableCell className="w-[40%] min-w-[120px] px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
-                            {transaction.description}
+                            {transaction.origem}
                           </TableCell>
                           <TableCell className="w-[20%] min-w-[40px] px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
-                            {transaction.refunded ? "Aprovado" : "Pendente"}
+                            {transaction.status === "pendente"
+                              ? "Pendente"
+                              : "Aprovado"}
                           </TableCell>
                           <TableCell
                             className={`w-[20%] min-w-[70px] px-1 md:px-2 py-3 text-xs md:text-sm text-right font-bold ${valueColor}`}
                           >
-                            {formatMoney(transaction.amount)}
+                            {formatMoney(transaction.valor)}
                           </TableCell>
                         </TableRow>
                       );
