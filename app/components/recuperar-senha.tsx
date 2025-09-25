@@ -3,22 +3,8 @@
 import type React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Mail,
-  Lock,
-  Briefcase,
-  Eye,
-  EyeOff,
-  ArrowRight,
-  AlertCircle,
-  Check,
-  RefreshCw,
-} from "lucide-react";
+import { ArrowRight, AlertCircle, Check, RefreshCw } from "lucide-react";
 import { API_BASE_URL, apiService } from "@/lib/api";
-import { authManager } from "@/lib/auth";
-import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LabelInput } from "./label-input";
 import {
@@ -27,7 +13,6 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { ArrowLeft } from "lucide-react";
-import { format } from "path";
 
 interface RecuperarSenhaProps {
   setCardView: (view: string) => void;
@@ -124,19 +109,21 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
 
     if (allRequirementsMet && passwordsMatch) {
       try {
-        const response = await fetch(`${API_BASE_URL}/password/otp/reset`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: email,
-            role: "user",
-            otp: otp,
-            password: formData.novaSenha,
-            password_confirmation: formData.confirmarSenha,
-          }),
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/password/otp/change-password`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: email,
+              otp: otp,
+              new_password: formData.novaSenha,
+              new_password_confirmation: formData.confirmarSenha,
+            }),
+          }
+        );
 
         const data = await response.json();
         if (response.ok) {
@@ -165,10 +152,10 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
     setErrors({});
 
     try {
-      const response = await fetch(`${API_BASE_URL}/password/otp/request`, {
+      const response = await fetch(`${API_BASE_URL}/otp/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, role: "USER" }),
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
@@ -222,10 +209,10 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/password/otp/request`, {
+      const response = await fetch(`${API_BASE_URL}/otp/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, role: "USER" }),
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
@@ -256,14 +243,13 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
     setOtp(value);
     if (value.length === 6) {
       try {
-        const response = await fetch(`${API_BASE_URL}/password/otp/validate`, {
+        const response = await fetch(`${API_BASE_URL}/otp/validate`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             email: email,
-            role: "user",
             otp: value,
           }),
         });
@@ -299,7 +285,7 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
               key={index}
               className={`flex flex-col items-center justify-center gap-2.5 px-0 py-1 relative flex-1 grow border-b [border-bottom-style:solid] ${
                 step.isActive
-                  ? "bg-[#ff842a1a] border-primarymobi"
+                  ? "bg-[#fff12a1a] border-primary"
                   : "border-greyscale-70"
               }`}
             >
@@ -335,7 +321,7 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
                 <Button
                   type="button"
                   onClick={handleContinuar}
-                  className="w-full h-11 bg-primarymobi hover:bg-primarymobi/90 text-primaryblack font-h3"
+                  className="w-full h-11 bg-primary hover:bg-primary/90 text-primaryblack font-h3"
                   disabled={cooldown > 0} // desativa enquanto estiver no cooldown
                 >
                   {cooldown > 0 ? `Aguarde ${cooldown}s` : "Continuar"}
@@ -411,7 +397,7 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
                 <Button
                   type="button"
                   onClick={handleContinuar}
-                  className="w-full h-11 bg-primarymobi hover:bg-primarymobi/90 text-primaryblack font-h3"
+                  className="w-full h-11 bg-primary hover:bg-primary/90 text-primaryblack font-h3"
                   disabled={cooldown > 0}
                 >
                   {cooldown > 0
@@ -508,7 +494,7 @@ export default function RecuperarSenha({ setCardView }: RecuperarSenhaProps) {
               <div className="pt-0">
                 <Button
                   type="submit"
-                  className="h-11 w-full bg-primarymobi hover:bg-primarymobi/90 text-primaryblack font-h3 font-[number:var(--h3-font-weight)] text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] [font-style:var(--h3-font-style)] rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-11 w-full bg-primary hover:bg-primary/90 text-primaryblack font-h3 font-[number:var(--h3-font-weight)] text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] [font-style:var(--h3-font-style)] rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!canSubmit}
                 >
                   Alterar senha
