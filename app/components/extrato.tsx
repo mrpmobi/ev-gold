@@ -412,7 +412,7 @@ export function Extrato({ saldo }: ExtratoProps) {
                         <PaginationLink
                           className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg ${
                             item.active
-                              ? "bg-primarymobi text-primaryblack"
+                              ? "bg-primary text-primaryblack"
                               : "text-white hover:bg-greyscale-70"
                           }`}
                           onClick={() =>
