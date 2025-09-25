@@ -130,7 +130,7 @@ export function PatrociniosCard({
                    [font-style:var(--h4-font-style)]"
                   >
                     {formatMoney(
-                      downline.ganhos ? downline.ganhos.toString() : "0"
+                      downline.ganhos ? downline.ganhos : "0"
                     )}
                   </TableCell>
                 </TableRow>
