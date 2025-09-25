@@ -15,6 +15,7 @@ import { PatrociniosCard } from "./patrocinios-card";
 import { Redes } from "./redes";
 import { Extrato } from "./extrato";
 import { Perfil } from "./perfil";
+import { LicencaCard } from "./licenca-card";
 
 interface DashboardComponentProps {
   userEmail: string;
@@ -144,6 +145,7 @@ export default function DashboardComponent({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 pt-[24px]">
                 <div className="grid grid-cols-1 gap-4 md:gap-6">
                   <SaldoCard saldo={saldo} />
+                  {currentUser && <LicencaCard currentUser={currentUser} />}
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:gap-6">
                   <PatrociniosCard

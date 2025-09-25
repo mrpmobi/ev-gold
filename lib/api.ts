@@ -378,14 +378,18 @@ class ApiService {
           data: data.data.total_patrocinio,
         };
       } else {
-        throw new Error("Formato de resposta inesperado para total de patrocinios");
+        throw new Error(
+          "Formato de resposta inesperado para total de patrocinios"
+        );
       }
     } catch (error) {
       //console.error("API: Erro ao buscar usuário por email:", error);
       return {
         success: false,
         message:
-          error instanceof Error ? error.message : "Falha ao obter total de patrocinios",
+          error instanceof Error
+            ? error.message
+            : "Falha ao obter total de patrocinios",
       };
     }
   }
@@ -511,7 +515,37 @@ class ApiService {
       //console.error("Erro no cadastro:", error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : "Erro no cadastro",
+        message: error instanceof Error ? error.message : "Erro ao sacar",
+      };
+    }
+  }
+
+  async ativarLicenca(token: string, id: number): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/checkout/preference`, {
+        method: "POST",
+        headers: this.getHeaders(true, token),
+        body: JSON.stringify({ pedido_id: id }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `Erro HTTP: ${response.status}`);
+      }
+
+      return {
+        success: true,
+        data: data,
+      };
+    } catch (error) {
+      //console.error("Erro no cadastro:", error);
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Erro ao buscar link de ativação",
       };
     }
   }
