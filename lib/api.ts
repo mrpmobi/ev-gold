@@ -456,6 +456,37 @@ class ApiService {
     }
   }
 
+  async getExtrato(token: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/wallet/extrato`, {
+        method: "GET",
+        headers: this.getHeaders(true, token),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Erro HTTP: ${response.status}`);
+      }
+
+      if (data) {
+        return {
+          success: true,
+          data: data,
+        };
+      } else {
+        throw new Error("Formato de resposta inesperado para Extrato");
+      }
+    } catch (error) {
+      //console.error("API: Erro ao buscar usuário por email:", error);
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Falha ao obter extrato",
+      };
+    }
+  }
+
   async getGanhos(token: string): Promise<ApiResponse<ExtratoResponse>> {
     try {
       const response = await fetch(`${API_BASE_URL}/saldo/extrato`, {

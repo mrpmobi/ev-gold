@@ -13,11 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  formatDateSlash,
-  formatDateSlashMobile,
-  formatMoney,
-} from "@/utils/formatters";
+import { formatDate, formatDateMobile, formatMoney } from "@/utils/formatters";
 import React, { useEffect, useMemo, useState } from "react";
 import { DatePicker } from "./date-picker";
 import { StringToggleGroup } from "./string-togglegroup";
@@ -43,10 +39,11 @@ function toISODateString(date: Date | undefined): string | undefined {
 }
 
 interface Transaction {
-  data: string;
-  origem: string;
-  valor: string;
-  tipo: "entrada" | "saida";
+  created_at: string;
+  description: string;
+  refunded: boolean;
+  amount: string;
+  type: "entrada" | "saida";
 }
 
 interface ExtratoProps {
@@ -72,9 +69,9 @@ export function Extrato({ saldo }: ExtratoProps) {
     if (!token) return;
     const fetchExtrato = async () => {
       try {
-        const res = await apiService.getGanhos(token);
+        const res = await apiService.getExtrato(token);
         if (res.success && res.data) {
-          setInitialTableData(res.data.extrato);
+          setInitialTableData(res.data);
         }
       } catch (error) {
         //console.error("Erro ao carregar dados do usuário:", error);
@@ -119,15 +116,15 @@ export function Extrato({ saldo }: ExtratoProps) {
 
     initialTableData.forEach((item) => {
       const valorNumerico = parseFloat(
-        item.valor
+        item.amount
           .toString()
           .replace("R$ ", "")
           .replace(",", ".")
           .replace("-", "")
       );
-      if (item.tipo === "entrada") {
+      if (item.type === "entrada") {
         entradas += valorNumerico;
-      } else if (item.tipo === "saida") {
+      } else if (item.type === "saida") {
         saidas += valorNumerico;
       }
     });
@@ -151,20 +148,20 @@ export function Extrato({ saldo }: ExtratoProps) {
     return initialTableData.filter((item) => {
       if (
         searchTerm &&
-        !item.origem.toLowerCase().includes(searchTerm.toLowerCase())
+        !item.description.toLowerCase().includes(searchTerm.toLowerCase())
       ) {
         return false;
       }
 
-      if (typeFilter !== "todos" && item.tipo !== typeFilter) {
+      if (typeFilter !== "todos" && item.type !== typeFilter) {
         return false;
       }
 
-      if (startDate && item.data < startDate) {
+      if (startDate && item.created_at < startDate) {
         return false;
       }
 
-      if (endDate && item.data > endDate) {
+      if (endDate && item.created_at > endDate) {
         return false;
       }
 
@@ -352,11 +349,14 @@ export function Extrato({ saldo }: ExtratoProps) {
                 <Table className="w-full min-w-[240px] md:min-w-full">
                   <TableHeader>
                     <TableRow className="flex items-start justify-between pt-0 pb-2 px-0 relative self-stretch w-full flex-[0_0_auto] border-b [border-bottom-style:solid] border-greyscale-70 hover:bg-transparent">
-                      <TableHead className="w-[30%] min-w-[40px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
+                      <TableHead className="w-[20%] min-w-[40px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
                         Data
                       </TableHead>
-                      <TableHead className="w-[50%] min-w-[120px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
+                      <TableHead className="w-[40%] min-w-[120px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
                         Descrição
+                      </TableHead>
+                      <TableHead className="w-[20%] min-w-[40px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
+                        Status
                       </TableHead>
                       <TableHead className="w-[20%] min-w-[70px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)] text-right">
                         Valor
@@ -366,7 +366,7 @@ export function Extrato({ saldo }: ExtratoProps) {
                   <TableBody>
                     {currentTableData.map((transaction, index) => {
                       const valueColor =
-                        transaction.tipo === "entrada"
+                        transaction.type === "entrada"
                           ? "text-supportgreen"
                           : "text-supportred";
                       return (
@@ -374,21 +374,24 @@ export function Extrato({ saldo }: ExtratoProps) {
                           key={index}
                           className="flex items-center justify-between px-0 py-3 relative self-stretch w-full flex-[0_0_auto] border-0 hover:bg-transparent"
                         >
-                          <TableCell className="w-[30%] min-w-[40px] px-1 md:px-2 py-3 text-white text-xs md:text-sm">
+                          <TableCell className="w-[20%] min-w-[40px] px-1 md:px-2 py-3 text-white text-xs md:text-sm">
                             <span className="md:hidden">
-                              {formatDateSlashMobile(transaction.data)}
+                              {formatDateMobile(transaction.created_at)}
                             </span>
                             <span className="hidden md:inline">
-                              {formatDateSlash(transaction.data)}
+                              {formatDate(transaction.created_at)}
                             </span>
                           </TableCell>
-                          <TableCell className="w-[50%] min-w-[120px] px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
-                            {transaction.origem}
+                          <TableCell className="w-[40%] min-w-[120px] px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
+                            {transaction.description}
+                          </TableCell>
+                          <TableCell className="w-[20%] min-w-[40px] px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
+                            {transaction.refunded ? "Aprovado" : "Pendente"}
                           </TableCell>
                           <TableCell
                             className={`w-[20%] min-w-[70px] px-1 md:px-2 py-3 text-xs md:text-sm text-right font-bold ${valueColor}`}
                           >
-                            {formatMoney(transaction.valor)}
+                            {formatMoney(transaction.amount)}
                           </TableCell>
                         </TableRow>
                       );
