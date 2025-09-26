@@ -12,6 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label"; // Importe o componente Label
 
 function formatDate(date: Date | undefined) {
   if (!date) {
@@ -35,6 +36,7 @@ interface DatePickerProps {
   onDateChange?: (date: Date | undefined) => void;
   dateValue?: Date | null;
   placeholder?: string;
+  label?: string; // Adicione a propriedade label
   [key: string]: any;
   id: string;
   errors?: Record<string, string>;
@@ -45,6 +47,7 @@ export function DatePicker({
   dateValue,
   errors = {},
   id,
+  label, // Receba a propriedade label
   ...props
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
@@ -102,10 +105,10 @@ export function DatePicker({
       <div className="relative flex gap-2">
         <Input
           {...props}
-          id="date"
+          id={id} // Use o id passado como prop
           value={inputValue}
           placeholder={props.placeholder || "dd/mm/aaaa"}
-          className="flex h-11 items-center gap-2 px-4 py-3 relative self-stretch w-full bg-primarywhite rounded-sm border border-solid border-greyscale-30 text-black"
+          className="absolute h-11 items-center gap-2 px-4 py-4 pt-7 self-stretch w-full bg-primarywhite rounded-sm border border-solid border-greyscale-30 text-black"
           onChange={handleInputChange}
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {
@@ -114,6 +117,14 @@ export function DatePicker({
             }
           }}
         />
+        {label && (
+          <Label
+            htmlFor={id}
+            className="absolute left-4 transition-all duration-200 ease-in-out pointer-events-none top-1 text-xs text-greyscale-70"
+          >
+            {label}
+          </Label>
+        )}
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button

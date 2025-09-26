@@ -9,7 +9,7 @@ interface ProgressCardProps {
 
 export function ProgressCard({ completedPercentage }: ProgressCardProps) {
   return (
-    <Card className="border border-solid border-primarymobi bg-transparent">
+    <Card className="border border-solid border-primary bg-transparent">
       <CardContent className="flex items-center justify-center gap-4 min-h-[70px]">
         <div className="flex flex-col items-start gap-4 relative flex-1 grow">
           <div className="flex flex-col items-start gap-1 relative self-stretch w-full flex-[0_0_auto]">

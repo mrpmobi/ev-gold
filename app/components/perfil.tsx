@@ -4,12 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User } from "@/lib/api";
 import { getInitials } from "@/utils/get-initials";
-import { Award, RotateCcw, Trash2, UserSquare } from "lucide-react";
+import { Award, RotateCcw, Trash2 } from "lucide-react";
 import React, { useState, useEffect, useCallback } from "react";
 import { PerfilPersonalTab } from "./perfil-personal-tab";
 import { ProgressCard } from "./progress-card";
-import { PerfilContactTab } from "./perfil-contact-tab";
-import { PerfilAddressTab } from "./perfil-address-tab";
 import { authManager } from "../lib/auth";
 import { API_BASE_URL } from "@/lib/api";
 import { maskCPF } from "@/utils/masks";
@@ -17,11 +15,7 @@ import { ProfileData } from "@/types/profile";
 import { AlterarSenhaDialog } from "./alterar-senha-dialog";
 import { toast } from "sonner";
 
-const tabsData = [
-  { value: "personal", label: "Dados pessoais" },
-  { value: "contact", label: "Dados de contato" },
-  { value: "address", label: "Endereço" },
-];
+const tabsData = [{ value: "personal", label: "Dados pessoais" }];
 
 interface PerfilProps {
   user: User;
@@ -39,15 +33,6 @@ const calculateProfileCompletion = (data: ProfileData | null): number => {
     data.personal.gender,
     data.personal.profession,
     data.personal.tax_id,
-    data.contact.email,
-    data.contact.phone_number,
-    data.address.postal_code,
-    data.address.address,
-    data.address.number,
-    data.address.complement,
-    data.address.state,
-    data.address.city,
-    data.address.neighborhood,
   ];
 
   const filledFields = allFields.filter((field) => {
@@ -82,27 +67,15 @@ export function Perfil({ user, setUser }: PerfilProps) {
     }
 
     const payload = {
-      personal_data: {
+      personal: {
         name: profileData.personal.name,
-        username: profileData.personal.username ?? ".",
-        date_of_birth: profileData.personal.date_of_birth
+        nome_de_usuario: profileData.personal.username ?? ".",
+        data_nascimento: profileData.personal.date_of_birth
           ? profileData.personal.date_of_birth.toISOString().split("T")[0]
           : "",
-        gender: profileData.personal.gender ?? ".",
-        profession: profileData.personal.profession ?? ".",
-        document: profileData.personal.tax_id ?? ".",
-      },
-      address: {
-        postal_code: String(profileData.address.postal_code) ?? ".",
-        country: 25,
-        state: profileData.address.state ?? ".",
-        complement: !profileData.address.complement?.trim()
-          ? "."
-          : profileData.address.complement,
-        city: profileData.address.city ?? ".",
-        neighborhood: profileData.address.neighborhood ?? ".",
-        address: profileData.address.address ?? ".",
-        number: profileData.address.number ?? ".",
+        sexo: profileData.personal.gender ?? ".",
+        profissao: profileData.personal.profession ?? ".",
+        cpf: profileData.personal.tax_id ?? ".",
       },
     };
 
@@ -110,7 +83,7 @@ export function Perfil({ user, setUser }: PerfilProps) {
       setSaving(true);
       const token = authManager.getToken();
 
-      const response = await fetch(`${API_BASE_URL}/office/user/profile`, {
+      const response = await fetch(`${API_BASE_URL}/user/profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -145,18 +118,6 @@ export function Perfil({ user, setUser }: PerfilProps) {
     if (!profileData?.personal.gender) newErrors.gender = "Sexo obrigatório";
     if (!profileData?.personal.date_of_birth)
       newErrors.date_of_birth = "Data de nascimento obrigatória";
-    if (!profileData?.address.postal_code?.toString().trim())
-      newErrors.postal_code = "CEP obrigatório";
-    if (!profileData?.address.address?.trim())
-      newErrors.address = "Endereço obrigatório";
-    if (!profileData?.address.number?.toString().trim())
-      newErrors.number = "Número obrigatório";
-    if (!profileData?.address.state?.trim())
-      newErrors.state = "Estado obrigatório";
-    if (!profileData?.address.city?.trim())
-      newErrors.city = "Cidade obrigatória";
-    if (!profileData?.address.neighborhood?.trim())
-      newErrors.neighborhood = "Bairro obrigatório";
     return newErrors;
   };
 
@@ -164,7 +125,7 @@ export function Perfil({ user, setUser }: PerfilProps) {
     const fetchProfile = async () => {
       try {
         const token = authManager.getToken();
-        const response = await fetch(`${API_BASE_URL}/office/user/profile`, {
+        const response = await fetch(`${API_BASE_URL}/user/profile`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -179,29 +140,14 @@ export function Perfil({ user, setUser }: PerfilProps) {
         const normalized: ProfileData = {
           owner_id: data.owner_id ?? null,
           personal: {
-            id: data.personal.id,
             name: data.personal.name,
-            username: data.personal.username ?? null,
-            date_of_birth: data.personal.date_of_birth
-              ? new Date(data.personal.date_of_birth)
+            username: data.personal.nome_de_usuario ?? null,
+            date_of_birth: data.personal.data_nascimento
+              ? new Date(data.personal.data_nascimento)
               : null,
-            gender: data.personal.gender ?? null,
-            profession: data.personal.profession ?? "",
-            tax_id: data.personal.tax_id ?? data.personal.document ?? "",
-          },
-          contact: {
-            email: data.contact?.email ?? "",
-            phone_number: data.contact?.phone_number ?? "",
-          },
-          address: {
-            postal_code: data.address?.postal_code ?? null,
-            address: data.address?.address ?? null,
-            number: data.address?.number ?? null,
-            state: data.address?.state ?? null,
-            city: data.address?.city ?? null,
-            country: data.address?.country ?? null,
-            neighborhood: data.address?.neighborhood ?? null,
-            complement: data.address?.complement ?? null,
+            gender: data.personal.sexo ?? null,
+            profession: data.personal.profissao ?? "",
+            tax_id: data.personal.cpf ?? data.personal.cpf ?? "",
           },
         };
 
@@ -225,7 +171,7 @@ export function Perfil({ user, setUser }: PerfilProps) {
   if (loading)
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="w-12 h-12 border-4 border-t-primarymobi border-gray-200 rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-t-primary border-gray-200 rounded-full animate-spin"></div>
       </div>
     );
 
@@ -327,7 +273,7 @@ export function Perfil({ user, setUser }: PerfilProps) {
                   className="flex flex-col items-center justify-center gap-2.5 px-0 py-1 relative 
                     flex-1 grow border-b [border-bottom-style:solid] text-white 
                     data-[state=inactive]:border-greyscale-70 data-[state=inactive]:text-greyscale-50
-                    data-[state=active]:bg-[#ff842a1a] data-[state=active]:border-primarymobi"
+                    data-[state=active]:bg-[#ff842a1a] data-[state=active]:border-primary"
                 >
                   <div className="relative w-fit mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)]">
                     {tab.label}
@@ -349,39 +295,13 @@ export function Perfil({ user, setUser }: PerfilProps) {
               />
               <AlterarSenhaDialog />
             </TabsContent>
-
-            <TabsContent value="contact" className="mt-6 space-y-6">
-              <ProgressCard completedPercentage={completedPercentage} />
-
-              <PerfilContactTab
-                contactData={profileData?.contact}
-                setContactData={(newData) =>
-                  setProfileData((prev) =>
-                    prev ? { ...prev, contact: newData } : null
-                  )
-                }
-              />
-            </TabsContent>
-
-            <TabsContent value="address" className="mt-6 space-y-6">
-              <ProgressCard completedPercentage={completedPercentage} />
-              <PerfilAddressTab
-                addressData={profileData?.address}
-                setAddressData={(newData) =>
-                  setProfileData((prev) =>
-                    prev ? { ...prev, address: newData } : null
-                  )
-                }
-                errors={errors}
-              />
-            </TabsContent>
           </Tabs>
 
           <div className="flex justify-end w-full mt-4">
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="bg-primarymobi text-white px-6 py-2 rounded"
+              className="bg-primary text-white px-6 py-2 rounded"
             >
               {saving ? "Salvando..." : "Salvar"}
             </Button>

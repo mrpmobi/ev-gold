@@ -40,7 +40,7 @@ export function LabelSelect({
         >
           <SelectTrigger
             id={id}
-            className="flex h-11 items-center gap-2 px-4 py-3 relative self-stretch w-full bg-white rounded-sm border border-solid border-greyscale-30 pt-4"
+            className="flex h-11 text-black items-center gap-2 px-4 py-3 relative self-stretch w-full bg-white rounded-sm border border-solid border-greyscale-30 pt-4"
           >
             <Label
               htmlFor={id}

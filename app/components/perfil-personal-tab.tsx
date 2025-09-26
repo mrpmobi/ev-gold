@@ -1,7 +1,7 @@
 import { formatName } from "@/utils/formatters";
 import { LabelInput } from "./label-input";
 import { LabelSelect } from "./label-select";
-import { DatePicker, toLocalDate } from "./date-picker";
+import { DatePicker} from "./date-picker";
 import { maskCPF } from "@/utils/masks";
 import { ProfileData } from "@/types/profile";
 
@@ -80,8 +80,8 @@ export function PerfilPersonalTab({
           setPersonalData({ ...personalData, gender: val })
         }
         options={[
-          { value: "male", label: "Masculino" },
-          { value: "female", label: "Feminino" },
+          { value: "masculino", label: "Masculino" },
+          { value: "feminino", label: "Feminino" },
         ]}
         errors={errors}
       />
@@ -91,13 +91,13 @@ export function PerfilPersonalTab({
         label="Data de nascimento"
         dateValue={
           personalData.date_of_birth
-            ? toLocalDate(personalData.date_of_birth)
+            ? personalData.date_of_birth
             : null
         }
         onDateChange={(date) =>
           setPersonalData({
             ...personalData,
-            date_of_birth: date ? toLocalDate(date) : null,
+            date_of_birth: date ? date : null,
           })
         }
         errors={errors}
