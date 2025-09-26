@@ -8,10 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Downline, User } from "@/lib/api";
+import { Downline } from "@/lib/api";
 import { ArrowUpRightSquare } from "lucide-react";
 import React from "react";
-import { formatDate, formatMoney } from "@/utils/formatters";
+import { formatDate } from "@/utils/formatters";
 
 interface PatrociniosCardProps {
   downlines: Downline[];
@@ -73,22 +73,12 @@ export function PatrociniosCard({
                 </TableHead>
                 <TableHead
                   className="
-                relative w-fit mt-[-1.00px] font-h4 font-[number:var(--h4-font-weight)] text-greyscale-50 
+                relative text-right w-fit mt-[-1.00px] font-h4 font-[number:var(--h4-font-weight)] text-greyscale-50 
                 text-[length:var(--h4-font-size)] tracking-[var(--h4-letter-spacing)]
                  leading-[var(--h4-line-height)] whitespace-nowrap [font-style:var(--h4-font-style)]
                 "
                 >
                   Data de cadastro
-                </TableHead>
-                <TableHead
-                  className="
-                w-[61px] text-greyscale-50 text-right relative mt-[-1.00px] font-h4
-                 font-[number:var(--h4-font-weight)] text-[length:var(--h4-font-size)] 
-                 tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)]
-                  [font-style:var(--h4-font-style)]
-                "
-                >
-                  Ganhos
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -116,22 +106,12 @@ export function PatrociniosCard({
                     {downline.nivel_relativo}
                   </TableCell>
                   <TableCell
-                    className="relative w-[103px] mt-[-1.00px] font-h4 font-[number:var(--h4-font-weight)]
+                    className="relative text-right w-[103px] mt-[-1.00px] font-h4 font-[number:var(--h4-font-weight)]
                    text-primarywhite text-[length:var(--h4-font-size)] 
                    tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] 
                    [font-style:var(--h4-font-style)]"
                   >
                     {formatDate(downline.created_at)}
-                  </TableCell>
-                  <TableCell
-                    className="relative w-[61px] mt-[-1.00px] font-h4 font-[number:var(--h4-font-weight)]
-                   text-primarywhite text-[length:var(--h4-font-size)] text-right 
-                   tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] 
-                   [font-style:var(--h4-font-style)]"
-                  >
-                    {formatMoney(
-                      downline.ganhos ? downline.ganhos : "0"
-                    )}
                   </TableCell>
                 </TableRow>
               ))}

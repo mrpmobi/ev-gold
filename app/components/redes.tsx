@@ -289,12 +289,8 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                             Nível
                           </TableHead>
 
-                          <TableHead className="w-[25%] min-w-[80px] mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-greyscale-50 text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)] h-auto p-0">
-                            Data
-                          </TableHead>
-
-                          <TableHead className="w-[20%] min-w-[70px] mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-greyscale-50 text-[length:var(--h2-font-size)] text-right tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)] h-auto p-0">
-                            Ganhos
+                          <TableHead className="text-right w-[25%] min-w-[80px] mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-greyscale-50 text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)] h-auto p-0">
+                            Data de cadastro
                           </TableHead>
                         </TableRow>
                       </TableHeader>
@@ -325,14 +321,8 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                                 </Badge>
                               </TableCell>
 
-                              <TableCell className="w-[25%] min-w-[80px] relative mt-[-0.50px] font-h2 font-[number:var(--h2-font-weight)] text-white text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)] p-0">
+                              <TableCell className="text-right w-[25%] min-w-[80px] relative mt-[-0.50px] font-h2 font-[number:var(--h2-font-weight)] text-white text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)] p-0">
                                 {formatDate(row.date)}
-                              </TableCell>
-
-                              <TableCell className="w-[20%] min-w-[70px] relative mt-[-0.50px] font-h2 font-[number:var(--h2-font-weight)] text-white text-[length:var(--h2-font-size)] text-right tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)] p-0">
-                                {formatMoney(
-                                  row.ganhos ? row.ganhos : "0"
-                                )}
                               </TableCell>
                             </TableRow>
                           ))
