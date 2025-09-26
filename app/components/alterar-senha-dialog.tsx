@@ -99,22 +99,19 @@ export function AlterarSenhaDialog() {
   };
 
   const fetchSubmitPassword = async (data: {
-    old_password: string;
+    current_password: string;
     new_password: string;
     new_password_confirmation: string;
   }) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/office/user/change_password`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authManager.getToken()}`,
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/user/update-password`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authManager.getToken()}`,
+        },
+        body: JSON.stringify(data),
+      });
 
       const responseData = await response.json();
       setResultView(true);
@@ -140,7 +137,7 @@ export function AlterarSenhaDialog() {
 
     if (allRequirementsMet && passwordsMatch) {
       fetchSubmitPassword({
-        old_password: formData.senhaAtual,
+        current_password: formData.senhaAtual,
         new_password: formData.novaSenha,
         new_password_confirmation: formData.confirmarSenha,
       });
@@ -166,10 +163,6 @@ export function AlterarSenhaDialog() {
           <DialogTitle className="font-h1 font-[number:var(--h1-font-weight)] text-greyscale-30 text-[length:var(--h1-font-size)] tracking-[var(--h1-letter-spacing)] leading-[var(--h1-line-height)] whitespace-nowrap [font-style:var(--h1-font-style)]">
             Redefinir senha
           </DialogTitle>
-          <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-            <X className="w-8 h-8 text-greyscale-30" />
-            <span className="sr-only">Fechar</span>
-          </DialogClose>
         </DialogHeader>
 
         <DialogDescription className="flex flex-col gap-8 w-full">
@@ -190,7 +183,7 @@ export function AlterarSenhaDialog() {
                   />
                 </div>
 
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-[#f98e30] to-transparent my-2"></div>
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-primary to-transparent my-2"></div>
 
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-2">
@@ -255,7 +248,7 @@ export function AlterarSenhaDialog() {
                 <div className="pt-0">
                   <Button
                     type="submit"
-                    className="h-11 w-full bg-primarymobi hover:bg-primarymobi/90 text-primaryblack font-h3 font-[number:var(--h3-font-weight)] text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] [font-style:var(--h3-font-style)] rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="h-11 w-full bg-primary hover:bg-primary/90 text-primaryblack font-h3 font-[number:var(--h3-font-weight)] text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] [font-style:var(--h3-font-style)] rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!canSubmit}
                   >
                     Alterar senha
