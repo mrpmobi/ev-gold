@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Label } from "@/components/ui/label"; // Importe o componente Label
+import { Label } from "@/components/ui/label";
 
 function formatDate(date: Date | undefined) {
   if (!date) {
@@ -36,7 +36,7 @@ interface DatePickerProps {
   onDateChange?: (date: Date | undefined) => void;
   dateValue?: Date | null;
   placeholder?: string;
-  label?: string; // Adicione a propriedade label
+  label?: string;
   [key: string]: any;
   id: string;
   errors?: Record<string, string>;
@@ -47,7 +47,7 @@ export function DatePicker({
   dateValue,
   errors = {},
   id,
-  label, // Receba a propriedade label
+  label,
   ...props
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
@@ -57,6 +57,7 @@ export function DatePicker({
   const [month, setMonth] = React.useState<Date | undefined>(
     dateValue ?? undefined
   );
+  const [isFocused, setIsFocused] = React.useState(false);
 
   React.useEffect(() => {
     setInputValue(formatDate(dateValue ?? undefined));
@@ -64,7 +65,6 @@ export function DatePicker({
   }, [dateValue]);
 
   const handleDateChange = (newDate: Date | undefined) => {
-    // Sempre atualiza, mesmo se for a mesma data
     setInputValue(newDate ? formatDate(newDate) : "");
     setMonth(newDate ?? undefined);
     setOpen(false);
@@ -103,28 +103,34 @@ export function DatePicker({
   return (
     <div className="flex flex-col gap-3 flex-1 grow">
       <div className="relative flex gap-2">
-        <Input
-          {...props}
-          id={id} // Use o id passado como prop
-          value={inputValue}
-          placeholder={props.placeholder || "dd/mm/aaaa"}
-          className="absolute h-11 items-center gap-2 px-4 py-4 pt-7 self-stretch w-full bg-primarywhite rounded-sm border border-solid border-greyscale-30 text-black"
-          onChange={handleInputChange}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowDown") {
-              e.preventDefault();
-              setOpen(true);
-            }
-          }}
-        />
-        {label && (
-          <Label
-            htmlFor={id}
-            className="absolute left-4 transition-all duration-200 ease-in-out pointer-events-none top-1 text-xs text-greyscale-70"
-          >
-            {label}
-          </Label>
-        )}
+        {/* Container para input e label */}
+        <div className="relative flex-1">
+          <Input
+            {...props}
+            id={id}
+            value={inputValue}
+            placeholder={props.placeholder || "dd/mm/aaaa"}
+            className="flex h-11 items-center gap-2 px-4 py-3 pt-7 relative self-stretch w-full bg-primarywhite rounded-sm border border-solid border-greyscale-30 text-black"
+            onChange={handleInputChange}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setOpen(true);
+              }
+            }}
+          />
+
+          {label && (
+            <Label
+              htmlFor={id}
+              className="absolute left-4 transition-all duration-200 ease-in-out pointer-events-none top-1 text-xs text-greyscale-70"
+            >
+              {label}
+            </Label>
+          )}
+        </div>
+
+        {/* Botão do calendário - posicionado absolutamente mas em relação ao container principal */}
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -149,12 +155,12 @@ export function DatePicker({
               month={month}
               onMonthChange={setMonth}
               onSelect={handleDateChange}
-              // Desabilita o toggle behavior
               modifiers={{ selected: dateValue ? [dateValue] : [] }}
             />
           </PopoverContent>
         </Popover>
       </div>
+
       {errors[id] && (
         <div className="flex items-end flex-col gap-4 w-full">
           <Alert

@@ -353,16 +353,16 @@ export function Extrato({ saldo }: ExtratoProps) {
                 <Search className="!relative !w-4 !h-4" />
               </div>
             </div>
-            <div className="hidden md:flex w-[372px] items-center gap-2 relative">
+            <div className="hidden md:flex w-[372px] items-center gap-2">
               <DatePicker
                 id="data-inicial"
-                placeholder="Data de início"
+                label="Data de início"
                 dateValue={dataInicial}
                 onDateChange={setDataInicial}
               />
               <DatePicker
                 id="data-final"
-                placeholder="Data de término"
+                label="Data de término"
                 dateValue={dataFinal}
                 onDateChange={setDataFinal}
               />
