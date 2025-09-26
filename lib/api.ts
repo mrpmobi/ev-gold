@@ -188,7 +188,7 @@ class ApiService {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         const msg = `Erro HTTP: ${response.status}`;
         throw new Error(msg);
@@ -411,6 +411,37 @@ class ApiService {
     }
   }
 
+  async getAtivo(token: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/ativo`, {
+        method: "GET",
+        headers: this.getHeaders(true, token),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Erro HTTP: ${response.status}`);
+      }
+
+      if (data) {
+        return {
+          success: true,
+          data: data,
+        };
+      } else {
+        throw new Error("Formato de resposta inesperado para getAtivo");
+      }
+    } catch (error) {
+      //console.error("API: Erro ao buscar usuário por email:", error);
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Falha ao obter getAtivo",
+      };
+    }
+  }
+
   async saque(token: string, amount: number): Promise<ApiResponse<any>> {
     try {
       const response = await fetch(`${API_BASE_URL}/user/withdrawals`, {
@@ -443,7 +474,7 @@ class ApiService {
       const response = await fetch(`${API_BASE_URL}/checkout/preference`, {
         method: "POST",
         headers: this.getHeaders(true, token),
-        body: JSON.stringify({ pedido_id: id }),
+        body: JSON.stringify({ usuario_id: id }),
       });
 
       const data = await response.json();

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User } from "@/types/profile";
@@ -14,22 +14,62 @@ interface LicencaCardProps {
 
 export function LicencaCard({ currentUser }: LicencaCardProps) {
   const [status, setStatus] = useState<Status>("PENDENTE");
+  const [loading, setLoading] = useState(false);
+  const [linkPagamento, setLinkPagamento] = useState("");
+
+  useEffect(() => {
+    const fetchLicencaAtiva = async () => {
+      const token = authManager.getToken();
+      if (!token) {
+        toast.error("Token de autenticação não encontrado.");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const result = await apiService.getAtivo(token);
+
+        if (result.success && result.data?.ativo) {
+          setStatus("ATIVA");
+        } else {
+          toast.error(result.message || "Erro ao obter link de pagamento.");
+        }
+      } catch (err) {
+        toast.error("Erro de rede. Tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchLinkLicenca = async () => {
+      const token = authManager.getToken();
+      if (!token) {
+        toast.error("Token de autenticação não encontrado.");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const result = await apiService.ativarLicenca(token, currentUser.id);
+
+        if (result.success && result.data?.init_point) {
+          setLinkPagamento(result.data.init_point);
+        } else {
+          toast.error(result.message || "Erro ao obter link de pagamento.");
+        }
+      } catch (err) {
+        toast.error("Erro de rede. Tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLicencaAtiva();
+    if (status === "PENDENTE") fetchLinkLicenca();
+  }, []);
 
   const handleClick = async () => {
-    const token = authManager.getToken();
-    if (!token) return;
-    try {
-      const result = await apiService.ativarLicenca(token, currentUser.id);
-
-      if (result.success && result.data?.init_point) {
-        // Open the payment link in a new window/tab
-        window.open(result.data.init_point, "_blank", "noopener,noreferrer");
-      } else {
-        toast.error(result.message || "Erro ao obter link de pagamento.");
-      }
-    } catch (err) {
-      toast.error("Erro de rede. Tente novamente mais tarde.");
-    }
+    window.open(linkPagamento);
   };
 
   const statusStyles = {
@@ -61,9 +101,16 @@ export function LicencaCard({ currentUser }: LicencaCardProps) {
             ${currentStatusStyle.circleColor}
           `}
           ></div>
-          <span className="font-medium">{status}</span>
+          <span className="font-medium">
+            {loading ? "Carregando..." : status}
+          </span>
         </div>
-        <Button onClick={handleClick}>Ativar Licença</Button>
+        <Button
+          className={`${(loading || status === "ATIVA") && "hidden"}`}
+          onClick={handleClick}
+        >
+          Ativar Licença
+        </Button>
       </CardContent>
     </Card>
   );
