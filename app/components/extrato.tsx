@@ -76,10 +76,7 @@ export function Extrato({ saldo }: ExtratoProps) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [ganhosRes, saquesRes] = await Promise.all([
-          apiService.getGanhos(token),
-          apiService.getExtrato(token),
-        ]);
+        const [ganhosRes] = await Promise.all([apiService.getGanhos(token)]);
 
         let mergedTableData: Transaction[] = [];
 
