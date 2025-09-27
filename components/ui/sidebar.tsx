@@ -245,7 +245,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       }}
       {...props}
     >
-      <Menu className="w-6 h-6 text-primarymobi" />
+      <Menu className="w-6 h-6 text-primary" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );

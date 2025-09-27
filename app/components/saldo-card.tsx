@@ -32,24 +32,6 @@ export function SaldoCard({ info, saldo }: SaldoCardProps) {
               </TooltipContent>
             </Tooltip>
           </div>
-
-          <ToggleGroup
-            type="single"
-            className="w-full md:w-auto text-[#959595] text-[12px] border-[1px] border-[#424242] px-2 py-1 gap-1 overflow-hidden"
-          >
-            <ToggleGroupItem value="hoje" className="hover:bg-[#424242] hover:text-[#C0C0C0] data-[state=on]:bg-[#FF842A] h-[26px] data-[state=on]:shadow-[0px_9px_40px_0px_#FF964A] font-normal flex-initial">
-              Hoje
-            </ToggleGroupItem>
-            <ToggleGroupItem value="semana" className="hover:bg-[#424242] hover:text-[#C0C0C0] data-[state=on]:bg-[#FF842A] h-[26px] data-[state=on]:shadow-[0px_9px_40px_0px_#FF964A] font-normal flex-initial">
-              Semana
-            </ToggleGroupItem>
-            <ToggleGroupItem value="mes" className="hover:bg-[#424242] hover:text-[#C0C0C0] data-[state=on]:bg-[#FF842A] h-[26px] data-[state=on]:shadow-[0px_9px_40px_0px_#FF964A] font-normal flex-initial">
-              Mês
-            </ToggleGroupItem>
-            <ToggleGroupItem value="ano" className="hover:bg-[#424242] hover:text-[#C0C0C0] data-[state=on]:bg-[#FF842A] h-[26px] data-[state=on]:shadow-[0px_9px_40px_0px_#FF964A] font-normal flex-initial">
-              12 meses
-            </ToggleGroupItem>
-          </ToggleGroup>
         </div>
       </CardHeader>
 

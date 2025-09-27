@@ -1,5 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetFooter, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Filter } from "lucide-react";
 import { StringToggleGroup } from "./string-togglegroup";
 import { useState } from "react";
@@ -15,7 +20,15 @@ interface ExtratoSheetProps {
   setDataFinal: (date: Date | undefined) => void;
 }
 
-export function ExtratoSheet({ typeFilter, onTypeChange, typeOptions, dataInicial, setDataInicial, dataFinal, setDataFinal }: ExtratoSheetProps) {
+export function ExtratoSheet({
+  typeFilter,
+  onTypeChange,
+  typeOptions,
+  dataInicial,
+  setDataInicial,
+  dataFinal,
+  setDataFinal,
+}: ExtratoSheetProps) {
   const [open, setOpen] = useState(false);
 
   const handleClear = () => {
@@ -51,7 +64,11 @@ export function ExtratoSheet({ typeFilter, onTypeChange, typeOptions, dataInicia
               <div className="relative w-fit mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-greyscale-50 text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)]">
                 Filtrar por tipo
               </div>
-              <StringToggleGroup filter={typeFilter} onChange={onTypeChange} options={typeOptions} />
+              <StringToggleGroup
+                filter={typeFilter}
+                onChange={onTypeChange}
+                options={typeOptions}
+              />
             </div>
 
             <div className="inline-flex items-start gap-2 flex-col relative flex-[0_0_auto]">
@@ -59,8 +76,18 @@ export function ExtratoSheet({ typeFilter, onTypeChange, typeOptions, dataInicia
                 Filtrar por período
               </div>
               <div className="flex w-[372px] items-center gap-2 relative">
-                <DatePicker placeholder="Data de início" dateValue={dataInicial} onDateChange={setDataInicial} />
-                <DatePicker placeholder="Data de término" dateValue={dataFinal} onDateChange={setDataFinal} />
+                <DatePicker
+                  label="Data de início"
+                  dateValue={dataInicial}
+                  onDateChange={setDataInicial}
+                  id={"datainicial"}
+                />
+                <DatePicker
+                  label="Data de término"
+                  dateValue={dataFinal}
+                  onDateChange={setDataFinal}
+                  id={"dataFinal"}
+                />
               </div>{" "}
             </div>
           </div>
@@ -68,7 +95,7 @@ export function ExtratoSheet({ typeFilter, onTypeChange, typeOptions, dataInicia
           <div className="flex items-start gap-2 self-stretch w-full flex-col relative flex-[0_0_auto] bg-primaryblack">
             <Button
               onClick={handleApply}
-              className="gap-1 px-4 py-3 bg-primarymobi flex h-11 items-center justify-center relative self-stretch w-full rounded-sm hover:bg-primarymobi/90"
+              className="gap-1 px-4 py-3 bg-primary flex h-11 items-center justify-center relative self-stretch w-full rounded-sm hover:bg-/90"
             >
               <div className="relative w-fit font-h3 font-[number:var(--h3-font-weight)] text-primaryblack text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
                 Aplicar

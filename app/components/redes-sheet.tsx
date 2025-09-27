@@ -61,7 +61,7 @@ export function RedesSheet({ levelFilter, onLevelChange, levelOptions, timeFilte
           <div className="flex items-start gap-2 self-stretch w-full flex-col relative flex-[0_0_auto] bg-primaryblack">
             <Button
               onClick={handleApply}
-              className="gap-1 px-4 py-3 bg-primarymobi flex h-11 items-center justify-center relative self-stretch w-full rounded-sm hover:bg-primarymobi/90"
+              className="gap-1 px-4 py-3 bg-primary flex h-11 items-center justify-center relative self-stretch w-full rounded-sm hover:bg-primary/90"
             >
               <div className="relative w-fit font-h3 font-[number:var(--h3-font-weight)] text-primaryblack text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
                 Aplicar

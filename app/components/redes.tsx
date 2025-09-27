@@ -53,7 +53,8 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const itemsPerPage = 20; // Alterado para 20 itens por página
+  const itemsPerPage = 20;
+  const [nivel, setNivel] = useState(1);
 
   const fetchDownlines = async () => {
     try {
@@ -78,6 +79,13 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
           0
         );
         setTotalCount(somaTotal);
+
+        // Encontrar o maior nível no array de downlines
+        const maxLevel =
+          res.data.downlines && res.data.downlines.length > 0
+        ? Math.max(...res.data.downlines.map((d: Downline) => d.nivel_relativo))
+        : 1;
+        setNivel(maxLevel);
       } else {
         console.error("Failed to fetch downlines:", res.data);
         setDownlines([]);
@@ -106,10 +114,10 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
   }, [downlines, currentPage, itemsPerPage]);
 
   const statsData = [
-    { label: "Total de patrocínios", value: downlinesAllCount },
+    { label: "Total de licenciados", value: downlinesAllCount },
     {
-      label: "Total de ganhos",
-      value: 0,
+      label: "Nivel atual",
+      value: nivel,
     },
   ];
 

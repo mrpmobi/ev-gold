@@ -143,9 +143,9 @@ export function Extrato({ saldo }: ExtratoProps) {
           .replace(",", ".")
           .replace("-", "")
       );
-      if (item.tipo === "entrada" && item.status === "aprovado") {
+      if (item.tipo === "entrada" && item.status === "sucesso") {
         entradas += valorNumerico;
-      } else if (item.tipo === "saida" && item.status === "aprovado") {
+      } else if (item.tipo === "saida" && item.status === "sucesso") {
         saidas += valorNumerico;
       }
     });
@@ -276,7 +276,7 @@ export function Extrato({ saldo }: ExtratoProps) {
             <Card className="flex-1 min-h-[70px] bg-primaryblack rounded-lg border-0 p-4 md:p-6">
               <CardContent className="flex-row md:flex w-full md:items-center md:justify-between p-0 space-y-4 md:space-y-0">
                 <div className="text-greyscale-40 font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto text-left">
-                  <span>Todas as entradas</span>
+                  <span>Total aprovado</span>
                 </div>
                 <div className="text-supportgreen font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
                   <div className="flex justify-start items-center space-x-1">
@@ -374,7 +374,7 @@ export function Extrato({ saldo }: ExtratoProps) {
                         Data
                       </TableHead>
                       <TableHead className="w-[40%] min-w-[120px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
-                        Descrição
+                        Licenciado
                       </TableHead>
                       <TableHead className="w-[20%] min-w-[40px] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
                         Status

@@ -98,7 +98,7 @@ export function LinkCard({ linkConvite }: LinkCardProps) {
             </Button>
           </div>
 
-          <Button onClick={handleShareButton} className="h-11 whitespace-nowrap flex items-center gap-2 bg-primarymobi text-primaryblack hover:bg-secondaryorange-m rounded-xs">
+          <Button onClick={handleShareButton} className="h-11 whitespace-nowrap flex items-center gap-2 bg-primary text-primaryblack hover:bg-secondaryorange-m rounded-xs">
             Compartilhar
             <Share className="w-4 h-4" />
           </Button>
