@@ -6,14 +6,14 @@ import { toast } from "sonner";
 import { authManager } from "@/lib/auth";
 import { apiService } from "@/lib/api";
 
-type Status = "PENDENTE" | "ATIVA";
+type Status = "PENDENTE" | "ATIVA" | "";
 
 interface LicencaCardProps {
   currentUser: User;
 }
 
 export function LicencaCard({ currentUser }: LicencaCardProps) {
-  const [status, setStatus] = useState<Status>("PENDENTE");
+  const [status, setStatus] = useState<Status>("");
   const [loading, setLoading] = useState(false);
   const [linkPagamento, setLinkPagamento] = useState("");
 
@@ -41,6 +41,10 @@ export function LicencaCard({ currentUser }: LicencaCardProps) {
       }
     };
 
+    fetchLicencaAtiva();
+  }, []);
+
+  useEffect(() => {
     const fetchLinkLicenca = async () => {
       const token = authManager.getToken();
       if (!token) {
@@ -63,10 +67,10 @@ export function LicencaCard({ currentUser }: LicencaCardProps) {
         setLoading(false);
       }
     };
-
-    fetchLicencaAtiva();
-    if (status === "PENDENTE") fetchLinkLicenca();
-  }, []);
+    if (status === "PENDENTE") {
+      fetchLinkLicenca();
+    }
+  }, [status]);
 
   const handleClick = async () => {
     window.open(linkPagamento);
@@ -78,6 +82,9 @@ export function LicencaCard({ currentUser }: LicencaCardProps) {
     },
     ATIVA: {
       circleColor: "bg-green-500",
+    },
+    "": {
+      circleColor: "bg-gray-500",
     },
   };
 
