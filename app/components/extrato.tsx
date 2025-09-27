@@ -102,31 +102,6 @@ export function Extrato({ saldo }: ExtratoProps) {
           );
           mergedTableData = [...mergedTableData, ...mappedGanhos];
         }
-
-        // Map and merge saques data
-        if (saquesRes.success && saquesRes.data) {
-          const mappedSaques = saquesRes.data.map(
-            (item: {
-              created_at: any;
-              description: any;
-              refunded: any;
-              amount: any;
-            }) => ({
-              data: item.created_at,
-              origem: item.description,
-              status: item.refunded ? "aprovado" : "pendente",
-              valor: item.amount,
-              tipo: "saida",
-            })
-          );
-          mergedTableData = [...mergedTableData, ...mappedSaques];
-        }
-
-        // Sort merged data by date (most recent first)
-        mergedTableData.sort(
-          (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
-        );
-
         setInitialTableData(mergedTableData);
       } catch (error) {
         // Handle error appropriately
