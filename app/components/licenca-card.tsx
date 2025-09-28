@@ -29,10 +29,17 @@ export function LicencaCard({ currentUser }: LicencaCardProps) {
       try {
         const result = await apiService.getAtivo(token);
 
-        if (result.success && result.data?.ativo) {
-          setStatus("ATIVA");
-        } else {
+        if (!result.success) {
           toast.error(result.message || "Erro ao obter link de pagamento.");
+          return;
+        }
+
+        if (result.success && result.data) {
+          if (result.data.ativo) {
+            setStatus("ATIVA");
+          } else {
+            setStatus("PENDENTE");
+          }
         }
       } catch (err) {
         toast.error("Erro de rede. Tente novamente mais tarde.");
