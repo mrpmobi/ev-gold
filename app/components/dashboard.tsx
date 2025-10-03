@@ -16,6 +16,7 @@ import { Redes } from "./redes";
 import { Extrato } from "./extrato";
 import { Perfil } from "./perfil";
 import { LicencaCard } from "./licenca-card";
+import { LinkCard } from "./link-card";
 
 interface DashboardComponentProps {
   userEmail: string;
@@ -34,6 +35,8 @@ export default function DashboardComponent({
   const [saldo, setSaldo] = useState("0.00");
   const [downlines, setDownlines] = useState<Downline[]>([]);
   const [downlinesAllCount, setDownlinesAllCount] = useState<number>(0);
+  const urlBase = window.location.origin;
+  const linkConvite = `${urlBase}/register/${currentUser?.id || 0}`;
 
   useEffect(() => {
     const fetchTotalPatrocinios = async () => {
@@ -146,6 +149,7 @@ export default function DashboardComponent({
                 <div className="grid grid-cols-1 gap-4 md:gap-6">
                   <SaldoCard saldo={saldo} />
                   {currentUser && <LicencaCard currentUser={currentUser} />}
+                  <LinkCard linkConvite={linkConvite} />
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:gap-6">
                   <PatrociniosCard
