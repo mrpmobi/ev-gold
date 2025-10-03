@@ -10,9 +10,10 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { formatCel, formatCpf, formatName } from "@/utils/formatters";
 import { validarCPF } from "@/utils/validators";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, CheckCircle, X } from "lucide-react";
 import Link from "next/link";
 import { apiService } from "@/lib/api";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const API_BASE = "https://ti.mrpmobi.com.br";
 const TOKEN =
@@ -42,6 +43,8 @@ export default function RegisterPage() {
     isActive: number === activeStep,
   }));
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [registerError, setRegisterError] = useState<string | null>(null);
+  const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [stepFields, SetStepFields] = useState(["name", "cpf"]);
@@ -145,24 +148,29 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
+    setRegisterError(null);
 
-    const payload: any = {
-      ...formData,
-      patrocinador_id: patrocinador?.id || Number(patrocinadorId),
-    };
-
-    delete payload.cpf;
+    // Toast de carregamento
+    const loadingToast = toast.loading("Realizando cadastro...");
 
     try {
       const result = await apiService.register({
-        nome: payload.name,
+        nome: formData.name,
         email: formData.email,
         senha: formData.password,
         patrocinador_id: Number.parseInt(patrocinadorId || "1"),
       });
 
+      // Remove o toast de loading
+      toast.dismiss(loadingToast);
+
       if (result.success && result.data) {
-        toast.success("Cadastro realizado com sucesso!");
+        // Toast de sucesso
+        toast.success("Cadastro realizado com sucesso! Redirecionando...", {
+          duration: 3000,
+        });
+        setRegisterSuccess("Cadastro realizado com sucesso! Redirecionando...");
+
         setFormData({
           name: "",
           email: "",
@@ -171,18 +179,42 @@ export default function RegisterPage() {
           password_confirmation: "",
         });
 
-        router.push("https://ev.mrpgold.com.br/");
+        // Aguarda um pouco antes de redirecionar para o usuário ver a mensagem de sucesso
+        setTimeout(() => {
+          router.push("https://ev.mrpgold.com.br/");
+        }, 2000);
       } else {
-        //console.log("Erro no cadastro:", data);
-        toast.error(result.message || "Erro ao cadastrar.");
+        toast.error(
+          result.message || "Erro ao realizar cadastro. Tente novamente.",
+          {
+            duration: 5000,
+          }
+        );
+        setRegisterError(
+          result.message || "Erro ao realizar cadastro. Tente novamente."
+        );
+        ativaStep(1);
       }
-    } catch (err) {
-      //console.error("Erro na requisição:", err);
-      toast.error("Erro de rede. Tente novamente mais tarde.");
+    } catch (err: any) {
+      // Remove o toast de loading
+      toast.dismiss(loadingToast);
+
+      // Toast de erro de rede
+      toast.error(
+        err.message ||
+          "Erro de conexão. Verifique sua internet e tente novamente.",
+        { duration: 5000 }
+      );
+      setRegisterError(
+        err.message ||
+          "Erro de conexão. Verifique sua internet e tente novamente."
+      );
+      ativaStep(1);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className="flex flex-col h-screen items-center justify-center gap-4 p-6 relative bg-[linear-gradient(180deg,rgba(29,29,29,1)_0%,rgba(15,15,15,1)_100%)]">
       <img
@@ -204,7 +236,7 @@ export default function RegisterPage() {
                 <div
                   key={index}
                   className={`flex flex-col items-center justify-center gap-2.5 px-0 py-1 relative flex-1 grow border-b [border-bottom-style:solid] ${
-                    step.isActive ? "bg-[#ff842a1a]" : "border-greyscale-70"
+                    step.isActive ? "bg-[#fffb2a1a]" : "border-greyscale-70"
                   }`}
                 >
                   <div
@@ -279,23 +311,30 @@ export default function RegisterPage() {
               relative flex-[0_0_auto] rounded-sm h-auto"
                 type={activeStep === 3 ? "submit" : "button"}
                 onClick={avancaStep}
+                disabled={loading}
               >
-                {(activeStep === 1 || activeStep === 2) && (
+                {loading ? (
+                  <div className="relative w-fit mt-[-1.00px] font-h3 font-[number:var(--h3-font-weight)] text-primaryblack text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
+                    Cadastrando...
+                  </div>
+                ) : (
                   <>
-                    <div className="relative w-fit mt-[-1.00px] font-h3 font-[number:var(--h3-font-weight)] text-primaryblack text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
-                      Continuar
-                    </div>
-
-                    <ArrowRight className="!relative !w-4 !h-4" />
-                  </>
-                )}
-                {activeStep === 3 && (
-                  <>
-                    <div className="relative w-fit mt-[-1.00px] font-h3 font-[number:var(--h3-font-weight)] text-primaryblack text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
-                      Confirmar cadastro
-                    </div>
-
-                    <Check className="!relative !w-4 !h-4" />
+                    {(activeStep === 1 || activeStep === 2) && (
+                      <>
+                        <div className="relative w-fit mt-[-1.00px] font-h3 font-[number:var(--h3-font-weight)] text-primaryblack text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
+                          Continuar
+                        </div>
+                        <ArrowRight className="!relative !w-4 !h-4" />
+                      </>
+                    )}
+                    {activeStep === 3 && (
+                      <>
+                        <div className="relative w-fit mt-[-1.00px] font-h3 font-[number:var(--h3-font-weight)] text-primaryblack text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
+                          Confirmar cadastro
+                        </div>
+                        <Check className="!relative !w-4 !h-4" />
+                      </>
+                    )}
                   </>
                 )}
               </Button>
@@ -325,6 +364,34 @@ export default function RegisterPage() {
             </Link>
           </CardContent>
         </Card>
+
+        {registerError && (
+          <div className="flex items-end flex-col gap-4 w-full">
+            <Alert
+              variant="destructive"
+              className="flex gap-2 p-4 w-[343px] bg-[#fef2f2] rounded-sm border border-solid border-[#dc2626]"
+            >
+              <X className="w-4 h-4 mt-0.5" />
+              <AlertDescription className="font-p-1 font-[number:var(--p-1-font-weight)] text-[length:var(--p-1-font-size)] tracking-[var(--p-1-letter-spacing)] leading-[var(--p-1-line-height)] [font-style:var(--p-1-font-style)]">
+                {registerError}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
+        {registerSuccess && (
+          <div className="flex items-end flex-col gap-4 w-full">
+            <Alert
+              variant="default"
+              className="flex gap-2 p-4 w-[343px] bg-[#f3fef2] rounded-sm border border-solid border-[#4adc26] text-[#277413]"
+            >
+              <CheckCircle className="w-4 h-4 mt-0.5 " />
+              <AlertDescription className="text-[#277413] font-p-1 font-[number:var(--p-1-font-weight)] text-[length:var(--p-1-font-size)] tracking-[var(--p-1-letter-spacing)] leading-[var(--p-1-line-height)]">
+                {registerSuccess}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
       </div>
     </div>
   );
