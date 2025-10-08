@@ -1,10 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import {
-  type User,
-  type Downline,
-  apiService,
-} from "@/lib/api";
+import { type User, type Downline, apiService } from "@/lib/api";
 import { authManager } from "@/lib/auth";
 import { HeaderPanel } from "./header-panel";
 import { AppSidebar } from "./app-sidebar";
@@ -18,6 +14,7 @@ import { LicencaCard } from "./licenca-card";
 import { LinkCard } from "./link-card";
 import { LicenceStatus } from "@/types/licence";
 import { Saques } from "./saques";
+import { Banner } from "./banner";
 
 interface DashboardComponentProps {
   userEmail: string;
@@ -148,25 +145,28 @@ export default function DashboardComponent({
           ></div>
           {currentPage === "home" && (
             <>
+              <div className="flex justify-center w-full">
+              <Banner />
+              </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 pt-[24px]">
-                <div className="grid grid-cols-1 gap-4 md:gap-6">
-                  <SaldoCard saldo={saldo} />
-                  {currentUser && (
-                    <LicencaCard
-                      currentUser={currentUser}
-                      status={licenceStatus}
-                      setStatus={setLicenceStatus}
-                    />
-                  )}
-                  <LinkCard linkConvite={linkConvite} />
-                </div>
-                <div className="grid grid-cols-1 gap-4 md:gap-6">
-                  <PatrociniosCard
-                    downlines={downlines}
-                    downlinesAllCount={downlinesAllCount}
-                    setCurrentPage={setCurrentPage}
-                  />
-                </div>
+              <div className="grid grid-cols-1 gap-4 md:gap-6">
+                <SaldoCard saldo={saldo} />
+                {currentUser && (
+                <LicencaCard
+                  currentUser={currentUser}
+                  status={licenceStatus}
+                  setStatus={setLicenceStatus}
+                />
+                )}
+                <LinkCard linkConvite={linkConvite} />
+              </div>
+              <div className="grid grid-cols-1 gap-4 md:gap-6">
+                <PatrociniosCard
+                downlines={downlines}
+                downlinesAllCount={downlinesAllCount}
+                setCurrentPage={setCurrentPage}
+                />
+              </div>
               </div>
             </>
           )}

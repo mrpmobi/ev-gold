@@ -158,7 +158,7 @@ export function HeaderPanel({
       </div>
       <div className="flex flex-row items-center gap-6 h-10 px-6 w-full justify-end">
         <div className="flex flex-row items-center gap-1">
-          {licenceStatus ==="ATIVA" && (
+          {licenceStatus === "ATIVA" && (
             <Button
               size="icon"
               className="bg-primaryblack hover:bg-primary text-greyscale-70 hover:text-primaryblack"
@@ -176,8 +176,8 @@ export function HeaderPanel({
           >
             <Headset className="w-6 h-6" />
           </Button>
+          <UltimosGanhos />
         </div>
-        <UltimosGanhos />
         <NavUser
           name={name}
           handleLogout={handleLogout}
