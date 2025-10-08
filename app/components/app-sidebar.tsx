@@ -14,7 +14,15 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { Home, List, ListChecks, Network, Share, X } from "lucide-react";
+import {
+  DollarSign,
+  Home,
+  List,
+  ListChecks,
+  Network,
+  Share,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AppSideBarProps {
@@ -84,6 +92,18 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
                   <div>
                     <List />
                     <span>Extrato</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem key="saques">
+                <SidebarMenuButton
+                  asChild
+                  onClick={handleClick.bind(null, "saques")}
+                  className="hover:bg-primary"
+                >
+                  <div>
+                    <DollarSign />
+                    <span>Saques</span>
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>

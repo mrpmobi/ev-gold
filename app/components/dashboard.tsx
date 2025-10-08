@@ -17,6 +17,7 @@ import { Perfil } from "./perfil";
 import { LicencaCard } from "./licenca-card";
 import { LinkCard } from "./link-card";
 import { LicenceStatus } from "@/types/licence";
+import { Saques } from "./saques";
 
 interface DashboardComponentProps {
   userEmail: string;
@@ -182,6 +183,11 @@ export default function DashboardComponent({
           {currentPage === "perfil" && userData && (
             <>
               <Perfil user={userData} setUser={setUserData} />
+            </>
+          )}
+          {currentPage === "saques" && userData && (
+            <>
+              <Saques />
             </>
           )}
         </main>
