@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import {
   type User,
   type Downline,
-  type ContagemPorNivel,
   apiService,
 } from "@/lib/api";
 import { authManager } from "@/lib/auth";
@@ -17,6 +16,7 @@ import { Extrato } from "./extrato";
 import { Perfil } from "./perfil";
 import { LicencaCard } from "./licenca-card";
 import { LinkCard } from "./link-card";
+import { LicenceStatus } from "@/types/licence";
 
 interface DashboardComponentProps {
   userEmail: string;
@@ -37,6 +37,7 @@ export default function DashboardComponent({
   const [downlinesAllCount, setDownlinesAllCount] = useState<number>(0);
   const urlBase = window.location.origin;
   const linkConvite = `${urlBase}/register/${currentUser?.id || 0}`;
+  const [licenceStatus, setLicenceStatus] = useState<LicenceStatus>("");
 
   useEffect(() => {
     const fetchTotalPatrocinios = async () => {
@@ -137,6 +138,7 @@ export default function DashboardComponent({
             name={userData?.name || currentUser?.name || "Carregando..."}
             handleLogout={handleLogout}
             setCurrentPage={setCurrentPage}
+            licenceStatus={licenceStatus}
           />
           <div
             className="pt-[80px] pb-[10px] flex flex-col items-start gap-4 md:gap-6 px-0 relative self-stretch w-full 
@@ -148,7 +150,13 @@ export default function DashboardComponent({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 pt-[24px]">
                 <div className="grid grid-cols-1 gap-4 md:gap-6">
                   <SaldoCard saldo={saldo} />
-                  {currentUser && <LicencaCard currentUser={currentUser} />}
+                  {currentUser && (
+                    <LicencaCard
+                      currentUser={currentUser}
+                      status={licenceStatus}
+                      setStatus={setLicenceStatus}
+                    />
+                  )}
                   <LinkCard linkConvite={linkConvite} />
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:gap-6">

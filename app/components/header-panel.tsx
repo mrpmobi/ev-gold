@@ -1,16 +1,18 @@
 "use client";
 
-import { Bell, Headset, Menu } from "lucide-react";
+import { Headset, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavUser } from "./nav-user";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { UltimosGanhos } from "./ultimos-ganhos";
 import { useState, useEffect } from "react";
+import { LicenceStatus } from "@/types/licence";
 
 interface HeaderPanelProps {
   name: string;
   handleLogout: () => void;
   setCurrentPage: (page: string) => void;
+  licenceStatus: LicenceStatus;
 }
 
 // Extend the Window interface to include Chatwoot properties
@@ -40,6 +42,7 @@ export function HeaderPanel({
   name,
   handleLogout,
   setCurrentPage,
+  licenceStatus,
 }: HeaderPanelProps) {
   const [isChatVisible, setIsChatVisible] = useState(false);
   const [chatwootLoaded, setChatwootLoaded] = useState(false);
@@ -139,6 +142,10 @@ export function HeaderPanel({
     setIsChatVisible(!isChatVisible);
   };
 
+  const handleMembersArea = () => {
+    window.open("https://mrpgold.com.br/", "_blank");
+  };
+
   return (
     <div
       className="flex flex-row justify-end items-center h-[70px] min-h-[70px] 
@@ -151,6 +158,17 @@ export function HeaderPanel({
       </div>
       <div className="flex flex-row items-center gap-6 h-10 px-6 w-full justify-end">
         <div className="flex flex-row items-center gap-1">
+          {licenceStatus ==="ATIVA" && (
+            <Button
+              size="icon"
+              className="bg-primaryblack hover:bg-primary text-greyscale-70 hover:text-primaryblack"
+              onClick={handleMembersArea}
+              title="Área de Membros"
+            >
+              <Users className="w-6 h-6" />
+            </Button>
+          )}
+
           <Button
             size="icon"
             className="bg-primaryblack hover:bg-primary text-greyscale-70 hover:text-primaryblack"

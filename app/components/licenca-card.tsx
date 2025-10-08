@@ -5,15 +5,20 @@ import { User } from "@/types/profile";
 import { toast } from "sonner";
 import { authManager } from "@/lib/auth";
 import { apiService } from "@/lib/api";
+import { LicenceStatus } from "@/types/licence";
 
-type Status = "PENDENTE" | "ATIVA" | "";
 
 interface LicencaCardProps {
   currentUser: User;
+  status: LicenceStatus;
+  setStatus: (status: LicenceStatus) => void;
 }
 
-export function LicencaCard({ currentUser }: LicencaCardProps) {
-  const [status, setStatus] = useState<Status>("");
+export function LicencaCard({
+  currentUser,
+  status,
+  setStatus,
+}: LicencaCardProps) {
   const [loading, setLoading] = useState(false);
   const [linkPagamento, setLinkPagamento] = useState("");
 
