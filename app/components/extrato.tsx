@@ -65,9 +65,15 @@ export function Extrato({ saldo }: ExtratoProps) {
   const [cpf, setCpf] = useState("");
   const [totalEntradas, setTotalEntradas] = useState(0);
   const [totalSaidas, setTotalSaidas] = useState(0);
-  const [saldoAtual, setSaldoAtual] = useState(saldo);
+  const [saldoAtual, setSaldoAtual] = useState(saldo || "0.00");
   const [initialTableData, setInitialTableData] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (saldo) {
+      setSaldoAtual(saldo);
+    }
+  }, [saldo]);
 
   useEffect(() => {
     const token = authManager.getToken();
@@ -267,8 +273,8 @@ export function Extrato({ saldo }: ExtratoProps) {
                 </div>
                 <div className="text-white font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
                   <div className="flex justify-start items-center space-x-1">
-                    <SaqueDialog cpf={cpf} saldo={saldoAtual} />
-                    <span>{formatMoney(saldoAtual)}</span>
+                    <SaqueDialog cpf={cpf} saldo={saldoAtual || "0.00"} />
+                    <span>{formatMoney(saldoAtual || "0.00")}</span>
                   </div>
                 </div>
               </CardContent>

@@ -29,13 +29,13 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
   const [resultView, setResultView] = useState(false);
   const [loading, setLoading] = useState(false);
   const [valorSaque, setValorSaque] = useState(() => {
-    return Math.round(parseFloat(saldo) * 100).toString();
+    return Math.round(parseFloat(saldo || "0") * 100);
   });
   const [error, setError] = useState("");
 
   useEffect(() => {
     setValorSaque(() => {
-      return Math.round(parseFloat(saldo) * 100).toString();
+      return Math.round(parseFloat(saldo || "0") * 100);
     });
   }, [saldo]);
 
@@ -44,10 +44,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
     const token = authManager.getToken();
     if (!token) return;
     try {
-      const result = await apiService.saque(
-        token,
-        parseFloat(valorSaque) / 100
-      );
+      const result = await apiService.saque(token, valorSaque / 100);
 
       if (result.success && result.data) {
         toast.success("Saque realizado com sucesso!");
@@ -69,7 +66,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
   const handleReturn = () => {
     setResult(null);
     setValorSaque(() => {
-      return Math.round(parseFloat(saldo) * 100).toString();
+      return Math.round(parseFloat(saldo) * 100);
     });
     setResultView(false);
   };
@@ -79,13 +76,13 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
 
     const valorNumerico = Math.min(
       parseInt(valorDigitado || "0", 10),
-      Math.round(parseFloat(saldo.toString()) * 100)
+      Math.round(parseFloat(saldo || "0") * 100)
     );
 
-    setValorSaque(valorNumerico.toString());
+    setValorSaque(valorNumerico ? valorNumerico : 0);
   };
 
-  const valorExibicao = formatMoney(parseFloat(valorSaque) / 100);
+  const valorExibicao = formatMoney(valorSaque / 100);
 
   return (
     <Dialog>
@@ -163,7 +160,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
             <footer className="flex flex-col gap-2 w-full">
               <Button
                 onClick={handleClick}
-                disabled={loading || parseFloat(valorSaque) / 100 < 50}
+                disabled={loading || valorSaque / 100 < 100}
                 className="h-11 w-full bg-primary rounded-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="font-h3 font-[number:var(--h3-font-weight)] text-primaryblack text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] whitespace-nowrap [font-style:var(--h3-font-style)]">
