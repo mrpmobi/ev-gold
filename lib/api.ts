@@ -496,7 +496,10 @@ class ApiService {
       const response = await fetch(`${API_BASE_URL}/user/withdrawals`, {
         method: "POST",
         headers: this.getHeaders(true, token),
-        body: JSON.stringify({ amount: amount }),
+        body: JSON.stringify({
+          amount: amount,
+          status_description: "Solicitação de saque de R$ " + amount,
+        }),
       });
 
       const data = await response.json();
