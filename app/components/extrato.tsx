@@ -120,6 +120,28 @@ export function Extrato({ saldo }: ExtratoProps) {
   useEffect(() => {
     const token = authManager.getToken();
     if (!token) return;
+    const fetchSaldo = async () => {
+      try {
+        const res = await apiService.getSaldo(token);
+        if (res.success && res.data) {
+          setTotalEntradas(res.data.amount_added || 0);
+          setTotalSaidas(res.data.amount_spent || 0);
+          setSaldoAtual(res.data.balance || "0.00");
+        }
+      } catch (error) {
+        //console.error("Erro ao carregar saldo:", error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSaldo();
+  }, []);
+
+  useEffect(() => {
+    const token = authManager.getToken();
+    if (!token) return;
     const fetchCPF = async () => {
       try {
         const res = await apiService.getUserData(token);
@@ -136,33 +158,6 @@ export function Extrato({ saldo }: ExtratoProps) {
 
     fetchCPF();
   }, []);
-
-  function calculaEntradasESaidas() {
-    let entradas = 0;
-    let saidas = 0;
-
-    initialTableData.forEach((item) => {
-      const valorNumerico = parseFloat(
-        item.valor
-          .toString()
-          .replace("R$ ", "")
-          .replace(",", ".")
-          .replace("-", "")
-      );
-      if (item.tipo === "entrada" && item.status === "sucesso") {
-        entradas += valorNumerico;
-      } else if (item.tipo === "saida" && item.status === "sucesso") {
-        saidas += valorNumerico;
-      }
-    });
-
-    setTotalEntradas(entradas);
-    setTotalSaidas(saidas);
-  }
-
-  useEffect(() => {
-    calculaEntradasESaidas();
-  }, [initialTableData]);
 
   useEffect(() => {
     setCurrentPage(1);

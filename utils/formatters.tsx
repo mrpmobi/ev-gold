@@ -24,8 +24,9 @@ export const formatName = (value: string): string => {
 };
 
 export function formatMoney(value: string | number): string {
-  const number =
-    typeof value === "string" ? parseFloat(value.replace(",", ".")) : value;
+  const number = typeof value === "string" 
+    ? parseFloat(value.replace(",", ".")) 
+    : value;
 
   if (isNaN(number)) return "R$ 0,00";
 

@@ -66,7 +66,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
   const handleReturn = () => {
     setResult(null);
     setValorSaque(() => {
-      return Math.round(parseFloat(saldo) * 100);
+      return Math.round(parseFloat(saldo || "0") * 100);
     });
     setResultView(false);
   };
@@ -117,7 +117,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
         {!loading && !resultView && (
           <>
             <DialogDescription className="flex flex-col gap-4 w-full">
-              <section className="flex flex-col gap-2 w-full">
+              <div className="flex flex-col gap-2 w-full">
                 <Card className="min-h-[70px] w-full rounded-lg overflow-hidden border border-solid border-primary bg-transparent">
                   <CardContent className="flex items-center justify-center gap-4">
                     <div className="flex flex-col gap-4 flex-1">
@@ -145,9 +145,9 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
                     </AlertDescription>
                   </Alert>
                 </div>
-              </section>
+              </div>
 
-              <section className="flex flex-col gap-1 w-full">
+              <div className="flex flex-col gap-1 w-full">
                 <LabelInput
                   id="valorSaque"
                   name="valorSaque"
@@ -155,7 +155,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
                   onChange={handleValorChange}
                   label="Valor do saque"
                 />
-              </section>
+              </div>
             </DialogDescription>
             <footer className="flex flex-col gap-2 w-full">
               <Button
