@@ -5,15 +5,23 @@ export function Banner() {
   return (
     <Card
       className="
-        relative flex justify-center items-center
-        my-6
-        w-[1014px] h-[207px] min-h-[70px]
-        rounded-lg
-        overflow-hidden
-        bg-primary border-0
+      relative
+      my-6
+      w-full max-w-[1014px]
+      rounded-lg
+      overflow-hidden
+      border-0
+      p-0
+      aspect-[4.9/1] md:aspect-[5/1] lg:aspect-[4.9/1]
       "
+      style={{
+        backgroundImage: "url('/banner-solare.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat"
+      }}
     >
-      <img src="/banner-solare.png" className="w-full h-auto my-0" />
+      {/* Conteúdo adicional pode ir aqui */}
     </Card>
   );
 }
