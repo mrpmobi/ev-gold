@@ -301,7 +301,7 @@ export function Extrato({ saldo }: ExtratoProps) {
                 </div>
                 <div className="text-white font-epilogue text-sm font-normal whitespace-nowrap w-full md:w-auto flex items-center justify-between md:justify-end space-x-2">
                   <div className="flex justify-start items-center space-x-1">
-                    <span>{formatMoney(totalEntradas - totalSaidas)}</span>
+                    <span>{formatMoney(saldoAtual)}</span>
                   </div>
                 </div>
               </CardContent>
