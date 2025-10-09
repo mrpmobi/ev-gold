@@ -66,10 +66,10 @@ export function Saques({}: SaquesProps) {
     const token = authManager.getToken();
     if (!token) return;
 
-    const fetchData = async () => {
+    const fetchSaques = async () => {
       try {
         setLoading(true);
-        const [saquesRes] = await Promise.all([apiService.getExtrato(token)]);
+        const [saquesRes] = await Promise.all([apiService.getSaques(token)]);
 
         let mergedTableData: Transaction[] = [];
 
@@ -102,7 +102,7 @@ export function Saques({}: SaquesProps) {
       }
     };
 
-    fetchData();
+    fetchSaques();
   }, []);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 import { User } from "@/types/profile";
+import { FilterParams } from "@/types/withdrawals";
 
 export const API_BASE_URL = "https://app.mrpgold.com.br/api";
 //export const API_BASE_URL = "http://127.0.0.1:8000/api/v1"
@@ -407,6 +408,54 @@ class ApiService {
         success: false,
         message:
           error instanceof Error ? error.message : "Falha ao obter extrato",
+      };
+    }
+  }
+
+  async getSaques(
+    token: string,
+    params?: FilterParams
+  ): Promise<ApiResponse<any>> {
+    try {
+      // Converter o body em query parameters
+      const queryParams = new URLSearchParams();
+
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== null && value !== undefined && value !== "") {
+            queryParams.append(key, value.toString());
+          }
+        });
+      }
+
+      const url = `${API_BASE_URL}/user/withdrawals${
+        queryParams.toString() ? `?${queryParams.toString()}` : ""
+      }`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: this.getHeaders(true, token),
+      });
+
+      const res = await response.json();
+
+      if (!response.ok) {
+        throw new Error(res.message || `Erro HTTP: ${response.status}`);
+      }
+
+      if (res) {
+        return {
+          success: true,
+          data: res,
+        };
+      } else {
+        throw new Error("Formato de resposta inesperado para Saques");
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "Falha ao obter saques",
       };
     }
   }
