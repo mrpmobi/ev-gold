@@ -12,7 +12,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const bannerImages = [
-  "/banner-solare.png",
   "/banner-solar2.png",
   "/banner-med.png",
 ];
