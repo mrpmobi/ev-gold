@@ -252,19 +252,19 @@ export function Saques({}: SaquesProps) {
               </div>
 
               <div className="">
-                <Table className="w-30 md:w-full md:min-w-full">
+                <Table className="w-full md:min-w-full">
                   <TableHeader>
-                    <TableRow className="flex items-start justify-between pt-0 pb-2 px-0 relative self-stretch w-75 md:w-full flex-[0_0_auto] border-b [border-bottom-style:solid] border-greyscale-70 hover:bg-transparent">
-                      <TableHead className="w-14 md:w-[15%]  px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
+                    <TableRow className="flex items-start justify-between pt-0 pb-2 px-0 relative self-stretch w-full border-b [border-bottom-style:solid] border-greyscale-70 hover:bg-transparent">
+                      <TableHead className="w-14 md:w-[15%]  px-0 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
                         Data
                       </TableHead>
-                      <TableHead className="w-33 md:w-[55%]  px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
+                      <TableHead className="w-33 md:w-[55%]  px-0 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
                         Descrição
                       </TableHead>
-                      <TableHead className="w-14 md:w-[15%] px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
+                      <TableHead className="w-14 md:w-[15%] px-0 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)]">
                         Status
                       </TableHead>
-                      <TableHead className="w-14 md:w-[15%]  px-1 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)] text-right">
+                      <TableHead className="w-14 md:w-[15%]  px-0 md:px-2 py-2 text-greyscale-50 relative font-h2 font-[number:var(--h2-font-weight)] text-xs md:text-sm tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] [font-style:var(--h2-font-style)] text-right">
                         Valor
                       </TableHead>
                     </TableRow>
@@ -278,9 +278,9 @@ export function Saques({}: SaquesProps) {
                       return (
                         <TableRow
                           key={index}
-                          className="flex items-center justify-between px-0 py-3 relative self-stretch w-75 md:w-full flex-[0_0_auto] border-0 hover:bg-transparent"
+                          className="flex items-center justify-between px-0 py-3 relative self-stretch w-full flex-[0_0_auto] border-0 hover:bg-transparent"
                         >
-                          <TableCell className="w-14 md:w-[15%] px-1 md:px-2 py-3 text-white text-xs md:text-sm">
+                          <TableCell className="w-14 md:w-[15%] px-0 md:px-2 py-3 text-white text-xs md:text-sm">
                             <span className="md:hidden">
                               {formatDateMobile(transaction.data)}
                             </span>
@@ -288,16 +288,16 @@ export function Saques({}: SaquesProps) {
                               {formatDate(transaction.data)}
                             </span>
                           </TableCell>
-                          <TableCell className="w-33 md:w-[55%]  px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
+                          <TableCell className="w-33 md:w-[55%] px-0 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                             Solicitação de saque
                           </TableCell>
-                          <TableCell className="w-14 md:w-[15%] px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
+                          <TableCell className="w-14 md:w-[15%] px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                             {transaction.status === "pendente"
                               ? "Pendente"
                               : "Pago"}
                           </TableCell>
                           <TableCell
-                            className={`w-14 md:w-[20%] px-1 md:px-2 py-3 text-xs md:text-sm text-right font-bold ${valueColor}`}
+                            className={`w-14 md:w-[15%] px-1 md:px-2 py-3 text-xs md:text-sm text-right font-bold ${valueColor}`}
                           >
                             {formatMoney(transaction.valor)}
                           </TableCell>
