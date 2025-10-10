@@ -146,49 +146,62 @@ export default function DashboardComponent({
           {currentPage === "home" && (
             <>
               <div className="flex justify-center w-full">
-              <Banner />
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 pt-[24px]">
-              <div className="grid grid-cols-1 gap-4 md:gap-6">
-                <SaldoCard saldo={saldo} />
-                {currentUser && (
-                <LicencaCard
-                  currentUser={currentUser}
-                  status={licenceStatus}
-                  setStatus={setLicenceStatus}
-                />
-                )}
-                <LinkCard linkConvite={linkConvite} />
-              </div>
-              <div className="grid grid-cols-1 gap-4 md:gap-6">
-                <PatrociniosCard
-                downlines={downlines}
-                downlinesAllCount={downlinesAllCount}
-                setCurrentPage={setCurrentPage}
-                />
-              </div>
+                <div className="w-full max-w-[1014px]">
+                  <Banner />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 pt-[24px]">
+                    <div className="grid grid-cols-1 gap-4 md:gap-6">
+                      <SaldoCard saldo={saldo} />
+                      {currentUser && (
+                        <LicencaCard
+                          currentUser={currentUser}
+                          status={licenceStatus}
+                          setStatus={setLicenceStatus}
+                        />
+                      )}
+                      <LinkCard linkConvite={linkConvite} />
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 md:gap-6">
+                      <PatrociniosCard
+                        downlines={downlines}
+                        downlinesAllCount={downlinesAllCount}
+                        setCurrentPage={setCurrentPage}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </>
           )}
           {currentPage === "redes" && (
-            <>
-              <Redes diretos={diretos} downlinesAllCount={downlinesAllCount} />
-            </>
+            <div className="flex justify-center w-full">
+              <div className="w-full max-w-[1014px]">
+                <Redes
+                  diretos={diretos}
+                  downlinesAllCount={downlinesAllCount}
+                />
+              </div>
+            </div>
           )}
           {currentPage === "extrato" && (
-            <>
-              <Extrato saldo={saldo} />
-            </>
+            <div className="flex justify-center w-full">
+              <div className="w-full max-w-[1014px]">
+                <Extrato saldo={saldo} />
+              </div>
+            </div>
           )}
           {currentPage === "perfil" && userData && (
-            <>
-              <Perfil user={userData} setUser={setUserData} />
-            </>
+            <div className="flex justify-center w-full">
+              <div className="w-full max-w-[1014px]">
+                <Perfil user={userData} setUser={setUserData} />
+              </div>
+            </div>
           )}
           {currentPage === "saques" && userData && (
-            <>
-              <Saques />
-            </>
+            <div className="flex justify-center w-full">
+              <div className="w-full max-w-[1014px]">
+                <Saques />
+              </div>
+            </div>
           )}
         </main>
       </SidebarProvider>
