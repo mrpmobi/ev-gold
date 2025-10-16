@@ -14,10 +14,7 @@ import { ArrowRight, Check, CheckCircle, X } from "lucide-react";
 import Link from "next/link";
 import { apiService } from "@/lib/api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const API_BASE = "https://ti.mrpmobi.com.br";
-const TOKEN =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiM2JmOWM4OTJlODc2ODMyZmYyYTBlZWVhZWY4NTYwYjVmNzJhZDNjMTY5ODAwMmZjM2U1ZjI5YjQ0NjhiMTQ1ZjBmMjFiNWFlOWY3MWQ4ZWQiLCJpYXQiOjE3NTQ5NTY2NTIuNDg0ODcyLCJuYmYiOjE3NTQ5NTY2NTIuNDg0ODc2LCJleHAiOjE3ODY0OTI2NTIuNDgxNDc2LCJzdWIiOiIyNzg5OSIsInNjb3BlcyI6W119.xX4JRFPYY48Wx-6U5femrqVdQkucz8prpdgER_pt_AVF_28ZN7fki-zZTMyn8GSaB_mF39IRcIAo8cz1Ppk87xIcLAb_ENn-8iB4yEb4ICt2MsjZ2pEtTL6DzSaYFTmBAO8X77ygaxGpfy8JHPcoYKhK1LtNcRz5wYzFX-baL7bvopynk8Xy7rBDzmVod4k10QYbEgpyUFRSfgMdoeNcm51rk8-32cuSx_1qwVNU-73P30ewUe90-4cBj-QEkfy6QlwsYX0o4xyFIoX86JxXthkW15m90Lyq2eaKvtM0Tjnmc-cewfV1fVSqeU1_mFhwaRHGRhXKUPQj0V2rA0SL1QIvSPtWcht5McFOg92UKsR21JeFu9YNbBPUQAOKPmY8kLUAbihMObyT1yx_-FZBfPxtxlT5zSWUYsVcUsM-6x5GIIfeAfuZMQNe2DJSjC14P0FCWAUYJCRkMZmptXvRHGB_h5NushGKiaAzMI2cElqelU0nNP474HIPRsv0IN2PGJVbQp48mw63ZgDSrStr0TbsPC8rVPj0r87a_sQwCdfY6b2ikWiuigOdu2SBNDvjxgQw7OfUZYTjIN4Ut8yE5_upP2LgOhRultfIUIrugDjzQXcy-nDvBGYTn9Df89hBw-zVwcIo-1xk4vwWR4S7xBhzIeOK2SyjVLzkIItv0aY";
+import { authManager } from "@/lib/auth";
 
 export default function RegisterPage() {
   const params = useParams();
@@ -52,23 +49,22 @@ export default function RegisterPage() {
   useEffect(() => {
     if (!patrocinadorId) return;
 
-    fetch(`${API_BASE}/api/v1/user/${patrocinadorId}`, {
-      headers: {
-        Authorization: `Bearer ${TOKEN}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.id && data?.name) {
-          setPatrocinador({ id: data.id, nome: data.name });
-        } else {
-          toast.error("Patrocinador não encontrado.");
+    const fetchPatrocinador = async () => {
+      try {
+        const token = authManager.getToken();
+        if (!token) return;
+        const res = await apiService.getUsername(token,
+          Number.parseInt(patrocinadorId)
+        );
+        if (res.success && res.data) {
+          setPatrocinador({ id: Number.parseInt(patrocinadorId), nome: res.data });
         }
-      })
-      .catch(() => {
-        toast.error("Erro ao buscar patrocinador. Verifique o link.");
-      });
-  }, [patrocinadorId]);
+      } catch (error) {
+        console.error("Erro ao buscar patrocinador:", error);
+      }
+    }
+    fetchPatrocinador();
+  }, [patrocinadorId as string]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -202,12 +198,12 @@ export default function RegisterPage() {
       // Toast de erro de rede
       toast.error(
         err.message ||
-          "Erro de conexão. Verifique sua internet e tente novamente.",
+        "Erro de conexão. Verifique sua internet e tente novamente.",
         { duration: 5000 }
       );
       setRegisterError(
         err.message ||
-          "Erro de conexão. Verifique sua internet e tente novamente."
+        "Erro de conexão. Verifique sua internet e tente novamente."
       );
       ativaStep(1);
     } finally {
@@ -226,23 +222,24 @@ export default function RegisterPage() {
         <Card className="w-[400px] min-h-[70px] bg-[#ffffff0d] rounded-2xl border border-solid border-greyscale-70 backdrop-blur-[5.85px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(5.85px)_brightness(100%)]">
           <CardContent className="gap-6 px-8 py-10 flex flex-col items-center justify-center">
             <div className="flex items-center justify-center gap-2.5 relative self-stretch w-full flex-[0_0_auto]">
-              <div className="relative w-fit mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-white text-[length:var(--h2-font-size)] text-center tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)]">
-                Cadastro conta de patrocinador
+              <div className="relative w-fit mt-[-1.00px] font-h1 font-[number:var(--h2-font-weight)] text-white text-[length:var(--h2-font-size)] text-center tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)]">
+                Cadastro de  conta
               </div>
+            </div>
+            <div className="relative w-fit mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-white text-[length:var(--h2-font-size)] text-center tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)]">
+              Patrocinador: {patrocinador ? patrocinador.nome : "Carregando..."}
             </div>
 
             <div className="flex items-start gap-1 relative self-stretch w-full flex-[0_0_auto]">
               {stepData.map((step, index) => (
                 <div
                   key={index}
-                  className={`flex flex-col items-center justify-center gap-2.5 px-0 py-1 relative flex-1 grow border-b [border-bottom-style:solid] ${
-                    step.isActive ? "bg-[#fffb2a1a]" : "border-greyscale-70"
-                  }`}
+                  className={`flex flex-col items-center justify-center gap-2.5 px-0 py-1 relative flex-1 grow border-b [border-bottom-style:solid] ${step.isActive ? "bg-[#fffb2a1a]" : "border-greyscale-70"
+                    }`}
                 >
                   <div
-                    className={`relative w-fit mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)] ${
-                      step.isActive ? "text-white" : "text-greyscale-50"
-                    }`}
+                    className={`relative w-fit mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)] ${step.isActive ? "text-white" : "text-greyscale-50"
+                      }`}
                   >
                     {step.number}
                   </div>
@@ -282,8 +279,8 @@ export default function RegisterPage() {
                       field.includes("password")
                         ? "password"
                         : field === "email"
-                        ? "email"
-                        : "text"
+                          ? "email"
+                          : "text"
                     }
                     value={(formData as any)[field]}
                     onChange={handleChange}

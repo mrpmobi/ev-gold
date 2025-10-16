@@ -216,6 +216,41 @@ class ApiService {
     }
   }
 
+  async getUsername(token: string, id: number): Promise<ApiResponse<string>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/nome/${id.toString()}`, {
+        method: "GET",
+        headers: this.getHeaders(true, token),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const msg = `Erro HTTP: ${response.status}`;
+        throw new Error(msg);
+      }
+
+      if (data && data.nome) {
+        return {
+          success: true,
+          data: data.nome,
+        };
+      } else {
+        throw new Error("Estrutura de dados inválida na resposta da API");
+      }
+    } catch (error) {
+      //console.error(`API: Erro ao buscar rede para ${userId}:`, error);
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Erro desconhecido ao buscar rede",
+        data: undefined,
+      };
+    }
+  }
+
   async refresh(token: string): Promise<ApiResponse<string>> {
     try {
       const response = await fetch(`${API_BASE_URL}/user/refresh`, {
@@ -428,9 +463,8 @@ class ApiService {
         });
       }
 
-      const url = `${API_BASE_URL}/user/withdrawals${
-        queryParams.toString() ? `?${queryParams.toString()}` : ""
-      }`;
+      const url = `${API_BASE_URL}/user/withdrawals${queryParams.toString() ? `?${queryParams.toString()}` : ""
+        }`;
 
       const response = await fetch(url, {
         method: "GET",
