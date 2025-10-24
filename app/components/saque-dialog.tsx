@@ -44,7 +44,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
     const token = authManager.getToken();
     if (!token) return;
     try {
-      const result = await apiService.saque(token, valorSaque / 100);
+      const result = await apiService.saque(token, valorSaque / 100, cpf);
 
       if (result.success && result.data) {
         toast.success("Saque realizado com sucesso!");

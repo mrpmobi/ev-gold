@@ -525,13 +525,14 @@ class ApiService {
     }
   }
 
-  async saque(token: string, amount: number): Promise<ApiResponse<any>> {
+  async saque(token: string, amount: number, cpf: string): Promise<ApiResponse<any>> {
     try {
       const response = await fetch(`${API_BASE_URL}/user/withdrawals`, {
         method: "POST",
         headers: this.getHeaders(true, token),
         body: JSON.stringify({
           amount: amount,
+          cpf: cpf,
           status_description: "Solicitação de saque de R$ " + amount,
         }),
       });
