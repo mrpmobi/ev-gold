@@ -44,9 +44,9 @@ interface Transaction {
   tipo: "entrada" | "saida";
 }
 
-interface SaquesProps {}
+interface SaquesProps { }
 
-export function Saques({}: SaquesProps) {
+export function Saques({ }: SaquesProps) {
   const [typeFilter, setTypeFilter] = useState("todos");
   const [dataInicial, setDataInicial] = useState<Date | undefined>(undefined);
   const [dataFinal, setDataFinal] = useState<Date | undefined>(undefined);
@@ -72,12 +72,12 @@ export function Saques({}: SaquesProps) {
             (item: {
               created_at: any;
               description: any;
-              refunded: any;
+              status: any;
               amount: any;
             }) => ({
               data: item.created_at,
               origem: item.description,
-              status: item.refunded ? "aprovado" : "pendente",
+              status: item.status,
               valor: item.amount,
               tipo: "saida",
             })
@@ -294,7 +294,7 @@ export function Saques({}: SaquesProps) {
                           <TableCell className="w-14 md:w-[15%] px-1 md:px-2 py-3 text-white font-bold text-xs md:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                             {transaction.status === "pendente"
                               ? "Pendente"
-                              : "Pago"}
+                              : transaction.status === "aprovado" ? "Aprovado" : "Rejeitado"}
                           </TableCell>
                           <TableCell
                             className={`w-14 md:w-[15%] px-1 md:px-2 py-3 text-xs md:text-sm text-right font-bold ${valueColor}`}
@@ -318,11 +318,10 @@ export function Saques({}: SaquesProps) {
                         </div>
                       ) : (
                         <PaginationLink
-                          className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg ${
-                            item.active
-                              ? "bg-primary text-primaryblack"
-                              : "text-white hover:bg-greyscale-70"
-                          }`}
+                          className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg ${item.active
+                            ? "bg-primary text-primaryblack"
+                            : "text-white hover:bg-greyscale-70"
+                            }`}
                           onClick={() =>
                             handlePageChange(parseInt(item.number))
                           }
