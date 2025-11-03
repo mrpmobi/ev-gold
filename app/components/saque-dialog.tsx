@@ -217,7 +217,7 @@ export function SaqueDialog({ cpf, saldo }: SaqueDialogProps) {
 
                   <div className="relative self-stretch font-p-1 font-[number:var(--p-1-font-weight)] text-greyscale-30 text-[length:var(--p-1-font-size)] text-center tracking-[var(--p-1-letter-spacing)] leading-[var(--p-1-line-height)] [font-style:var(--p-1-font-style)]">
                     Se a chave estiver cadastrada no seu banco, o deposito será
-                    concluído em até 2 horas.
+                    concluído em até 48 horas úteis.
                   </div>
                 </div>
               </div>
