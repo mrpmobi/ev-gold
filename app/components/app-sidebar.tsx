@@ -135,6 +135,16 @@ export function AppSidebar({ setCurrentPage }: AppSideBarProps) {
                   Termos e condições
                 </Link>
               </SidebarMenuItem>
+              <SidebarMenuItem key="contrato-licenca">
+                <Link
+                  href="/contrato-licenca"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Termos de Uso"
+                >
+                  Contrato de licença
+                </Link>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
