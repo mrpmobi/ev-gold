@@ -272,7 +272,7 @@ export function Saques({ }: SaquesProps) {
                   <TableBody>
                     {currentTableData.map((transaction, index) => {
                       const valueColor =
-                        transaction.tipo === "entrada"
+                        transaction.status === "aprovado"
                           ? "text-supportgreen"
                           : "text-supportred";
                       return (
