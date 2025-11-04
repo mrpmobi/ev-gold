@@ -15,6 +15,7 @@ import { LinkCard } from "./link-card";
 import { LicenceStatus } from "@/types/licence";
 import { Saques } from "./saques";
 import { Banner } from "./banner";
+import RegistrationForm from "./registration-form";
 
 interface DashboardComponentProps {
   userEmail: string;
@@ -36,6 +37,7 @@ export default function DashboardComponent({
   const urlBase = window.location.origin;
   const linkConvite = `${urlBase}/register/${currentUser?.id || 0}`;
   const [licenceStatus, setLicenceStatus] = useState<LicenceStatus>("");
+  const [showRegistrationForm, setShowRegistrationForm] = useState(true);
 
   useEffect(() => {
     const fetchTotalPatrocinios = async () => {
@@ -65,7 +67,7 @@ export default function DashboardComponent({
     const token = authManager.getToken();
     if (!token) return;
 
-    const fetchDiretos = async () => {};
+    const fetchDiretos = async () => { };
 
     fetchDiretos();
   }, [currentUser]);
@@ -106,7 +108,7 @@ export default function DashboardComponent({
         if (response.success && response.data) {
           setSaldo(response.data.balance);
         }
-      } catch (error) {}
+      } catch (error) { }
     };
 
     fetchSaldo();
@@ -127,17 +129,30 @@ export default function DashboardComponent({
     if (token) onLogout(token);
   };
 
+  const handleRegistrationComplete = () => {
+    setShowRegistrationForm(false);
+  }
+
   return (
     <div className="bg-[#1D1D1D] flex flex-col justify-center items-start p-4 md:p-6">
+      {showRegistrationForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#1D1D1D] p-6 rounded-lg max-w-md w-full mx-4">
+            <RegistrationForm onComplete={handleRegistrationComplete} />
+          </div>
+        </div>
+      )}
       <SidebarProvider>
         <AppSidebar setCurrentPage={setCurrentPage} />
         <main className="flex-1 w-full">
-          <HeaderPanel
-            name={userData?.name || currentUser?.name || "Carregando..."}
-            handleLogout={handleLogout}
-            setCurrentPage={setCurrentPage}
-            licenceStatus={licenceStatus}
-          />
+          {!showRegistrationForm && (
+            <HeaderPanel
+              name={userData?.name || currentUser?.name || "Carregando..."}
+              handleLogout={handleLogout}
+              setCurrentPage={setCurrentPage}
+              licenceStatus={licenceStatus}
+            />)
+          }
           <div
             className="pt-[80px] pb-[10px] flex flex-col items-start gap-4 md:gap-6 px-0 relative self-stretch w-full 
   flex-[0_0_auto] border-b [border-bottom-style:solid] border-transparent 
