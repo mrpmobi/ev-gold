@@ -8,7 +8,7 @@ export default function TermosDeUsoPage() {
       boxSizing: "border-box"
     }}>
       <iframe
-        src="/documents/politica-privacidade.pdf"
+        src="/documents/contrato-licenca.pdf"
         width="100%"
         height="100%"
         style={{
