@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,22 @@ interface RegistrationFormProps {
 const RegistrationForm = ({ onComplete }: RegistrationFormProps) => {
   const [accepted, setAccepted] = useState(false);
   const [currentDateTime] = useState(new Date().toLocaleString('pt-BR'));
-  const [ipAddress] = useState("187.14.xxx.xxx");
+  const [ipAddress, setIpAddress] = useState("");
+
+  useEffect(() => {
+    const getIpAddress = async () => {
+      try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        setIpAddress(data.ip);
+      } catch (error) {
+        console.error('Error fetching IP:', error);
+        setIpAddress('Não disponível');
+      }
+    };
+
+    getIpAddress();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,17 +51,17 @@ const RegistrationForm = ({ onComplete }: RegistrationFormProps) => {
     {
       icon: FileText,
       title: "Contrato de Prestação de Serviços Digitais",
-      url: "https://ev.mrpgold.com.br/documentos/contrato.pdf"
+      url: "https://ev.mrpgold.com.br/contrato-licenca"
     },
     {
       icon: Shield,
       title: "Termos de Uso da Plataforma",
-      url: "https://ev.mrpgold.com.br/documentos/termos.pdf"
+      url: "https://ev.mrpgold.com.br/termos-de-uso"
     },
     {
       icon: Lock,
       title: "Política de Privacidade e Proteção de Dados Pessoais",
-      url: "https://ev.mrpgold.com.br/documentos/privacidade.pdf"
+      url: "https://ev.mrpgold.com.br/politica-de-privacidade"
     }
   ];
 
