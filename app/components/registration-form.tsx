@@ -74,7 +74,7 @@ const RegistrationForm = ({ onComplete }: RegistrationFormProps) => {
           </div>
           <div>
             <CardTitle className="text-xl text-white">
-              Criar Conta
+              Aceitar Termos
             </CardTitle>
             <CardDescription className="text-greyscale-40 mt-2">
               Complete seu cadastro aceitando os termos e condições
@@ -155,7 +155,7 @@ const RegistrationForm = ({ onComplete }: RegistrationFormProps) => {
             className="w-full h-12 text-base font-semibold bg-yellow-500 hover:bg-yellow-600 text-greyscale-900 disabled:bg-greyscale-600 disabled:text-greyscale-400 transition-colors"
             size="lg"
           >
-            Criar Conta
+            Aceitar Termos
           </Button>
 
           <p className="text-xs text-center text-greyscale-40">
