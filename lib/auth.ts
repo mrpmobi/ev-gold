@@ -6,18 +6,20 @@ interface AuthData {
   expires_in?: number
   token_type?: string
   login_time?: number
+  terms_accepted?: boolean
 }
 
 class AuthManager {
   private readonly STORAGE_KEY = "mrp_mobi_auth"
 
-  saveAuth(user: User, token: string, expires_in?: number, token_type?: string): void {
+  saveAuth(user: User, token: string, expires_in?: number, token_type?: string, terms_accepted?: boolean): void {
     const authData: AuthData = {
       user,
       token,
       expires_in,
       token_type: token_type || "Bearer",
       login_time: Date.now(),
+      terms_accepted: terms_accepted || false,
     }
 
     if (typeof window !== "undefined") {

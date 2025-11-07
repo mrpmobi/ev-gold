@@ -35,7 +35,7 @@ export default function LoginComponent({
   const loadUserData = async (userId: number, token: string) => {
     setIsLoadingUserData(true);
     try {
-      const userResult = await apiService.getUserById(userId, token);
+      const userResult = await apiService.getUserData(token);
       if (userResult.success && userResult.data) {
         let userData = userResult.data;
 
@@ -67,21 +67,22 @@ export default function LoginComponent({
       });
 
       if (result.success && result.data && result.access_token) {
-          authManager.saveAuth(
-            result.data.user,
-            result.access_token,
-            result.data.expires_in,
-            result.data.token_type
-          );
+        authManager.saveAuth(
+          result.data.user,
+          result.access_token,
+          result.data.expires_in,
+          result.data.token_type,
+          result.data.accepted_terms
+        );
 
-          // Tracking do Meta Pixel
-          if (typeof window !== "undefined" && (window as any).fbq) {
-            (window as any).fbq("track", "CompleteRegistration");
-          }
+        // Tracking do Meta Pixel
+        if (typeof window !== "undefined" && (window as any).fbq) {
+          (window as any).fbq("track", "CompleteRegistration");
+        }
 
-          onLogin(result.data.user.email, {
-            ...result.data.user,
-          });
+        onLogin(result.data.user.email, {
+          ...result.data.user,
+        });
       } else {
         setError(
           result.message || "Email ou senha inválidos. Tente novamente."

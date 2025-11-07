@@ -4,6 +4,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Shield, Lock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { authManager } from "@/lib/auth";
+import { apiService } from "@/lib/api";
 
 interface RegistrationFormProps {
   onComplete?: () => void;
@@ -13,6 +15,7 @@ const RegistrationForm = ({ onComplete }: RegistrationFormProps) => {
   const [accepted, setAccepted] = useState(false);
   const [currentDateTime] = useState(new Date().toLocaleString('pt-BR'));
   const [ipAddress, setIpAddress] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getIpAddress = async () => {
@@ -29,7 +32,7 @@ const RegistrationForm = ({ onComplete }: RegistrationFormProps) => {
     getIpAddress();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!accepted) {
@@ -37,13 +40,21 @@ const RegistrationForm = ({ onComplete }: RegistrationFormProps) => {
       return;
     }
 
-    toast.success("Conta criada com sucesso!", {
-      description: "Bem-vindo à plataforma MRP GOLD"
-    });
+    try {
+      const token = authManager.getToken();
+      if (!token) return;
+      setLoading(true);
+      const [res] = await Promise.all([apiService.aceitarTermos(token)]);
 
-    // Chama a função de conclusão se for fornecida
-    if (onComplete) {
-      onComplete();
+      if (res.success && res.data) {
+        toast.success("Termos aceitos com sucesso!");
+        if (onComplete) onComplete();
+      }
+
+    } catch (error) {
+      console.error("Erro ao carregar dados do usuário:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -151,11 +162,11 @@ const RegistrationForm = ({ onComplete }: RegistrationFormProps) => {
           {/* Submit Button */}
           <Button
             onClick={handleSubmit}
-            disabled={!accepted}
+            disabled={!accepted || loading}
             className="w-full h-12 text-base font-semibold bg-yellow-500 hover:bg-yellow-600 text-greyscale-900 disabled:bg-greyscale-600 disabled:text-greyscale-400 transition-colors"
             size="lg"
           >
-            Aceitar Termos
+            {loading ? "Aceitando..." : "Aceitar Termos"}
           </Button>
 
           <p className="text-xs text-center text-greyscale-40">

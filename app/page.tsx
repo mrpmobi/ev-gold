@@ -4,7 +4,7 @@ import Head from "next/head";
 import LoginComponent from "./components/login";
 import DashboardComponent from "./components/dashboard";
 import CadastroComponent from "./components/cadastro";
-import { authManager } from "./lib/auth";
+import { authManager } from "@/lib/auth";
 import type { User } from "./lib/api";
 import { apiService } from "@/lib/api";
 
@@ -51,7 +51,7 @@ export default function HomePage() {
           const refresh = await refreshToken(auth.token);
 
           if (refresh) {
-            authManager.saveAuth(auth.user, refresh);
+            authManager.saveAuth(auth.user, refresh, auth.expires_in, auth.token_type, auth.terms_accepted);
             setUserEmail(auth.user.email);
             setCurrentUser(auth.user);
             setCurrentView("dashboard");

@@ -37,7 +37,16 @@ export default function DashboardComponent({
   const urlBase = window.location.origin;
   const linkConvite = `${urlBase}/register/${currentUser?.id || 0}`;
   const [licenceStatus, setLicenceStatus] = useState<LicenceStatus>("");
-  const [showRegistrationForm, setShowRegistrationForm] = useState(true);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+  useEffect(() => {
+    const auth = authManager.getAuth();
+    if (auth?.terms_accepted) {
+      setAcceptedTerms(true);
+    } else {
+      setAcceptedTerms(false);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchTotalPatrocinios = async () => {
@@ -130,12 +139,12 @@ export default function DashboardComponent({
   };
 
   const handleRegistrationComplete = () => {
-    setShowRegistrationForm(false);
+    setAcceptedTerms(true);
   }
 
   return (
     <div className="bg-[#1D1D1D] flex flex-col justify-center items-start p-4 md:p-6">
-      {showRegistrationForm && (
+      {!acceptedTerms && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[#1D1D1D] p-6 rounded-lg max-w-md w-full mx-4">
             <RegistrationForm onComplete={handleRegistrationComplete} />
@@ -145,7 +154,7 @@ export default function DashboardComponent({
       <SidebarProvider>
         <AppSidebar setCurrentPage={setCurrentPage} />
         <main className="flex-1 w-full">
-          {!showRegistrationForm && (
+          {acceptedTerms && (
             <HeaderPanel
               name={userData?.name || currentUser?.name || "Carregando..."}
               handleLogout={handleLogout}
