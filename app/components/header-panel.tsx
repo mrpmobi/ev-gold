@@ -7,6 +7,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { UltimosGanhos } from "./ultimos-ganhos";
 import { useState, useEffect } from "react";
 import { LicenceStatus } from "@/types/licence";
+import { BadgesModal } from "./badges-modal";
 
 interface HeaderPanelProps {
   name: string;
@@ -114,7 +115,7 @@ export function HeaderPanel({
     // Cleanup function
     return () => {
       // Remove event listeners
-      window.removeEventListener("chatwoot:ready", () => {});
+      window.removeEventListener("chatwoot:ready", () => { });
 
       // Don't remove script and container to avoid issues with Chatwoot
     };
@@ -157,6 +158,7 @@ export function HeaderPanel({
         <SidebarTrigger className="h-10 w-10 rounded-xs p-0 hover:bg-transparent md:hidden" />
       </div>
       <div className="flex flex-row items-center gap-6 h-10 px-6 w-full justify-end">
+        <BadgesModal />
         <div className="flex flex-row items-center gap-1">
           {licenceStatus === "ATIVA" && (
             <Button
