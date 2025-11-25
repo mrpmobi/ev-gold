@@ -8,14 +8,16 @@ import { authManager } from "@/lib/auth";
 import type { User } from "./lib/api";
 import { apiService } from "@/lib/api";
 
-type AppState = "login" | "dashboard" | "cadastro";
+type AppState = "login" | "dashboard" | "cadastro" | "maintenance";
+
+const MAINTENANCE_MODE = false;
 
 export default function HomePage() {
   const [userEmail, setUserEmail] = useState("");
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<User | null>(null);
-  const [currentView, setCurrentView] = useState<AppState>("login"); // Estado inicial sempre login
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true); // Novo estado para controlar a verificação
+  const [currentView, setCurrentView] = useState<AppState>("login");
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   const refreshToken = async (token: string) => {
     try {
@@ -42,12 +44,17 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    if (MAINTENANCE_MODE) {
+      setIsCheckingAuth(false);
+      setCurrentView("maintenance");
+      return;
+    }
+
     const checkAuth = async () => {
       try {
         const auth = authManager.getAuth();
 
         if (auth?.user?.id && auth?.token) {
-          // Tenta renovar o token apenas se existir auth válida
           const refresh = await refreshToken(auth.token);
 
           if (refresh) {
@@ -59,7 +66,6 @@ export default function HomePage() {
             throw new Error("Falha na renovação do token");
           }
         } else {
-          // Não há auth válida, vai para login
           setCurrentView("login");
           authManager.clearAuth();
         }
@@ -68,19 +74,56 @@ export default function HomePage() {
         setCurrentView("login");
         authManager.clearAuth();
       } finally {
-        setIsCheckingAuth(false); // Finaliza a verificação
+        setIsCheckingAuth(false);
       }
     };
 
     checkAuth();
   }, []);
 
-  // Renderiza loading enquanto verifica a autenticação
+  // 🔨 Componente da Página de Manutenção
+  const MaintenancePage = () => (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center p-4">
+      <div className="max-w-md w-full text-center">
+        <div className="mb-8">
+          <div className="w-24 h-24 mx-auto mb-4 bg-yellow-500 rounded-full flex items-center justify-center">
+            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">Sistema em Manutenção</h1>
+          <p className="text-gray-300 mb-4">
+            Estamos realizando uma manutenção programada para melhorar nossos serviços.
+            O sistema voltará ao normal em breve.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <div className="text-gray-500 text-sm">
+            <p>Para urgências, entre em contato:</p>
+            <p className="text-yellow-400 font-semibold">suporte@mrpgold.com.br</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   if (isCheckingAuth) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="w-12 h-12 border-4 border-t-primary border-gray-200 rounded-full animate-spin"></div>
       </div>
+    );
+  }
+
+  if (MAINTENANCE_MODE) {
+    return (
+      <>
+        <Head>
+          <title>Gold MRP - Em Manutenção</title>
+        </Head>
+        <MaintenancePage />
+      </>
     );
   }
 
@@ -90,7 +133,6 @@ export default function HomePage() {
     setUserData(loginData);
     setCurrentView("dashboard");
 
-    // Tracking do Meta Pixel para login
     if (typeof window !== "undefined" && (window as any).fbq) {
       (window as any).fbq("track", "CompleteRegistration");
     }
@@ -123,7 +165,6 @@ export default function HomePage() {
     setCurrentUser(userData);
     setCurrentView("dashboard");
 
-    // Tracking do Meta Pixel para cadastro
     if (typeof window !== "undefined" && (window as any).fbq) {
       (window as any).fbq("track", "Lead");
     }
@@ -132,11 +173,8 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>Pré-cadastro MRP Mobi</title>
-        {/* ... resto do head ... */}
+        <title>Gold MRP</title>
       </Head>
-
-      {/* ... resto do meta pixel ... */}
 
       <div id="root">
         {currentView === "login" && (

@@ -79,10 +79,10 @@ export function LicencaCard({
         setLoading(false);
       }
     };
-    if (status === "PENDENTE") {
-      fetchLinkLicenca();
-    }
-  }, [status]);
+
+    fetchLinkLicenca();
+
+  }, []);
 
   const handleClick = async () => {
     window.open(linkPagamento);
