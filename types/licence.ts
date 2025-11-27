@@ -1,1 +1,1 @@
-export type LicenceStatus = "PENDENTE" | "ATIVA" | "";
+export type LicenceStatus = "PENDENTE" | "ATIVA" | "" | "VENCIDA";

@@ -7,11 +7,15 @@ import { authManager } from "@/lib/auth";
 import { apiService } from "@/lib/api";
 import { LicenceStatus } from "@/types/licence";
 
-
 interface LicencaCardProps {
   currentUser: User;
   status: LicenceStatus;
   setStatus: (status: LicenceStatus) => void;
+}
+
+interface LicencaData {
+  ativo: boolean;
+  data_ativacao: string;
 }
 
 export function LicencaCard({
@@ -21,6 +25,7 @@ export function LicencaCard({
 }: LicencaCardProps) {
   const [loading, setLoading] = useState(false);
   const [linkPagamento, setLinkPagamento] = useState("");
+  const [dataAtivacao, setDataAtivacao] = useState<Date | null>(null);
 
   useEffect(() => {
     const fetchLicencaAtiva = async () => {
@@ -35,16 +40,26 @@ export function LicencaCard({
         const result = await apiService.getAtivo(token);
 
         if (!result.success) {
-          toast.error(result.message || "Erro ao obter link de pagamento.");
+          toast.error(result.message || "Erro ao verificar status da licença.");
           return;
         }
 
-        if (result.success && result.data) {
-          if (result.data.ativo) {
+        const licencaData = result.data as LicencaData;
+
+        if (licencaData.data_ativacao) {
+          const dataAtivacao = new Date(licencaData.data_ativacao);
+          const hoje = new Date();
+
+          setDataAtivacao(dataAtivacao);
+
+          if (dataAtivacao > hoje && licencaData.ativo) {
             setStatus("ATIVA");
           } else {
-            setStatus("PENDENTE");
+            setStatus("VENCIDA");
           }
+        } else {
+          setStatus("PENDENTE");
+          setDataAtivacao(null);
         }
       } catch (err) {
         toast.error("Erro de rede. Tente novamente mais tarde.");
@@ -56,51 +71,62 @@ export function LicencaCard({
     fetchLicencaAtiva();
   }, []);
 
-  useEffect(() => {
-    const fetchLinkLicenca = async () => {
-      const token = authManager.getToken();
-      if (!token) {
-        toast.error("Token de autenticação não encontrado.");
-        return;
+  const handleAtivarLicenca = async () => {
+    const token = authManager.getToken();
+    if (!token) {
+      toast.error("Token de autenticação não encontrado.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await apiService.ativarLicenca(token, currentUser.id);
+
+      if (result.success && result.data?.init_point) {
+        setLinkPagamento(result.data.init_point);
+        window.open(result.data.init_point);
+      } else {
+        toast.error(result.message || "Erro ao obter link de pagamento.");
       }
-
-      setLoading(true);
-      try {
-        const result = await apiService.ativarLicenca(token, currentUser.id);
-
-        if (result.success && result.data?.init_point) {
-          setLinkPagamento(result.data.init_point);
-        } else {
-          toast.error(result.message || "Erro ao obter link de pagamento.");
-        }
-      } catch (err) {
-        toast.error("Erro de rede. Tente novamente mais tarde.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLinkLicenca();
-
-  }, []);
-
-  const handleClick = async () => {
-    window.open(linkPagamento);
+    } catch (err) {
+      toast.error("Erro de rede. Tente novamente mais tarde.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const statusStyles = {
     PENDENTE: {
       circleColor: "bg-yellow-500",
+      text: "Pendente",
+      buttonText: "Ativar Licença"
     },
     ATIVA: {
       circleColor: "bg-green-500",
+      text: "Ativa",
+      buttonText: ""
+    },
+    VENCIDA: {
+      circleColor: "bg-red-500",
+      text: "Vencida",
+      buttonText: "Renovar Assinatura"
     },
     "": {
       circleColor: "bg-gray-500",
+      text: "Carregando...",
+      buttonText: ""
     },
   };
 
-  const currentStatusStyle = statusStyles[status];
+  const currentStatusStyle = statusStyles[status] || statusStyles[""];
+
+  const formatarData = (data: Date) => {
+    return data.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
 
   return (
     <Card className="flex flex-col items-start p-6 gap-2 bg-[#121212] rounded-lg flex-none flex-grow-0 border-0 h-auto min-h-[128px]">
@@ -121,15 +147,24 @@ export function LicencaCard({
           `}
           ></div>
           <span className="font-medium">
-            {loading ? "Carregando..." : status}
+            {loading ? "Carregando..." : currentStatusStyle.text}
           </span>
         </div>
-        <Button
-          className={`${(loading || status === "ATIVA") && "hidden"}`}
-          onClick={handleClick}
-        >
-          Ativar Licença
-        </Button>
+
+        {dataAtivacao && (
+          <div className="text-sm text-gray-400">
+            Data de ativação: {formatarData(dataAtivacao)}
+          </div>
+        )}
+
+        {(status === "PENDENTE" || status === "VENCIDA") && (
+          <Button
+            onClick={handleAtivarLicenca}
+            disabled={loading}
+          >
+            {loading ? "Carregando..." : currentStatusStyle.buttonText}
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

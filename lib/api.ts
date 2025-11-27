@@ -77,6 +77,7 @@ class ApiService {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       Accept: "application/json",
+      credentials: "include",
     };
 
     if (includeAuth && token) {
@@ -504,11 +505,11 @@ class ApiService {
       });
 
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || `Erro HTTP: ${response.status}`);
       }
-
+      
       if (data) {
         return {
           success: true,
