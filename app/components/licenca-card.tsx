@@ -153,7 +153,7 @@ export function LicencaCard({
 
         {dataAtivacao && (
           <div className="text-sm text-gray-400">
-            Data de ativação: {formatarData(dataAtivacao)}
+            Próxima ativação: {formatarData(dataAtivacao)}
           </div>
         )}
 
