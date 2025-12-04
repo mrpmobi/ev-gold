@@ -80,8 +80,8 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
         // Encontrar o maior nível no array de downlines
         const maxLevel =
           res.data.downlines && res.data.downlines.length > 0
-        ? Math.max(...res.data.downlines.map((d: Downline) => d.nivel_relativo))
-        : 1;
+            ? Math.max(...res.data.downlines.map((d: Downline) => d.nivel_relativo))
+            : 1;
         setNivel(maxLevel);
       } else {
         console.error("Failed to fetch downlines:", res.data);
@@ -111,10 +111,13 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
   }, [downlines, currentPage, itemsPerPage]);
 
   const statsData = [
-    { label: "Total de licenciados", value: downlinesAllCount },
     {
-      label: "Nivel atual",
-      value: nivel,
+      label: "Total de licenciados",
+      value: downlinesAllCount
+    },
+    {
+      label: "Ganhos",
+      value: formatMoney(downlinesAllCount * 17),
     },
   ];
 
@@ -127,16 +130,16 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
         downline.nivel_relativo === 1
           ? "bg-primary"
           : downline.nivel_relativo === 2
-          ? "bg-greyscale-70"
-          : "bg-greyscale-40",
+            ? "bg-greyscale-70"
+            : "bg-greyscale-40",
       levelText:
         downline.nivel_relativo === 1
           ? "text-primaryblack"
           : downline.nivel_relativo === 2
-          ? "text-white"
-          : "text-primaryblack",
+            ? "text-white"
+            : "text-primaryblack",
       date: downline.created_at || "",
-      ganhos: formatMoney("0"),
+      Ganhoss: formatMoney("0"),
     }));
   }, [currentPageData]);
 
@@ -248,7 +251,7 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                 filter={levelFilter}
                 onChange={onLevelChange}
                 options={levelOptions}
-                label="Nível"
+                label="Ganhos"
               />
               <StringToggleGroup
                 filter={timeFilter}
@@ -291,7 +294,7 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                           </TableHead>
 
                           <TableHead className="w-[15%] min-w-[50px] mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-greyscale-50 text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)] h-auto p-0 text-center">
-                            Nível
+                            Ganhos
                           </TableHead>
 
                           <TableHead className="text-right w-[25%] min-w-[80px] mt-[-1.00px] font-h2 font-[number:var(--h2-font-weight)] text-greyscale-50 text-[length:var(--h2-font-size)] tracking-[var(--h2-letter-spacing)] leading-[var(--h2-line-height)] whitespace-nowrap [font-style:var(--h2-font-style)] h-auto p-0">
@@ -350,11 +353,10 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                       <PaginationContent className="flex items-center gap-1">
                         <PaginationItem>
                           <PaginationLink
-                            className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg text-white hover:bg-greyscale-70 ${
-                              currentPage === 1
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
+                            className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg text-white hover:bg-greyscale-70 ${currentPage === 1
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                              }`}
                             onClick={() =>
                               currentPage > 1 &&
                               handlePageChange(currentPage - 1)
@@ -374,11 +376,10 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
                               </div>
                             ) : (
                               <PaginationLink
-                                className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg ${
-                                  item.active
-                                    ? "bg-primary text-primaryblack"
-                                    : "text-white hover:bg-greyscale-70"
-                                }`}
+                                className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg ${item.active
+                                  ? "bg-primary text-primaryblack"
+                                  : "text-white hover:bg-greyscale-70"
+                                  }`}
                                 onClick={() =>
                                   handlePageChange(parseInt(item.number))
                                 }
@@ -393,11 +394,10 @@ export function Redes({ diretos, downlinesAllCount }: RedesProps) {
 
                         <PaginationItem>
                           <PaginationLink
-                            className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg text-white hover:bg-greyscale-70 ${
-                              currentPage === totalPages
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
+                            className={`inline-flex min-w-8 h-8 items-center justify-center gap-2.5 p-2 relative flex-[0_0_auto] rounded-lg text-white hover:bg-greyscale-70 ${currentPage === totalPages
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                              }`}
                             onClick={() =>
                               currentPage < totalPages &&
                               handlePageChange(currentPage + 1)
